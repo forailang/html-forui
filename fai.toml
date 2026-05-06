@@ -1,0 +1,9 @@
+[project]
+name = "HtmlForui"
+version = "0.1.0"
+source_root = "src"
+
+[dependencies]
+Forui = "https://github.com/forailang/forui"
+# For local iteration on forui itself, swap to a relative path:
+# Forui = "file://../forui"

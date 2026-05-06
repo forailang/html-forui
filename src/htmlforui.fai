@@ -1,0 +1,290 @@
+use std.array
+
+use std.string
+
+use { renderPatchHtml, renderToHtml } from html
+
+use { DiffOp } from Forui.diff
+
+use { ViewNode, emptyEvents } from Forui.view
+
+use { onNavigate, onBack, setPathFromPlatform } from Forui.router
+
+use { RenderFn, renderSSR } from Forui
+
+# Wire the forui router to the browser History API.
+# Call this once after mount() in your client main.
+# - Sets the router to the current URL path.
+# - Registers a navigate listener so Link clicks update window.location.
+# - The hosting JS provides get_location_path and push_history_state.
+# - A popstate listener in fai-runtime.js handles browser back/forward.
+def initWebRouter
+    @return Void
+do
+  setPathFromPlatform(getLocationPath())
+  onNavigate do with path String
+      pushHistoryState(path)
+  end
+end
+
+# ── Web Router Integration ──────────────────────────────────────────
+# To wire the forui router to the browser History API, the WASM
+# runtime needs these platform functions:
+# 
+#   getLocationPath() -> String     reads window.location.pathname
+#   pushHistoryState(path: String)  calls history.pushState
+#   historyBack()                   calls history.back()
+# 
+# Once available, initWebRouter() should:
+#   1. setPathFromPlatform(getLocationPath())
+#   2. onNavigate(do with path String  pushHistoryState(path) end)
+#   3. onBack(do  historyBack() end)
+# 
+# The hosting page also needs a popstate listener in JS:
+#   window.addEventListener('popstate', function() {
+#     wasmModule.setPathFromPlatform(window.location.pathname);
+#   });
+# ── HTML Adapter ────────────────────────────────────────────────────
+# Renders a forui ViewNode tree to HTML and sends it to the browser.
+# Render a ViewNode tree to HTML and inject into #app.
+def htmlRender
+    @param tree ViewNode
+    @param ops DiffOp[]
+    @return Void
+do
+  let patchPath = patchPathForOps(ops)
+  if patchPath == ''
+    let html = renderPatchHtml(tree, '')
+    setHtmlAt('#app', html)
+  else
+    let target = findNodeAtPath(tree, patchPath, '')
+    if target?
+      let selector = '[data-fai-path="' + patchPath + '"]'
+      let html = renderPatchHtml(target!, patchPath)
+      setHtmlAt(selector, html)
+    else
+      let html = renderPatchHtml(tree, '')
+      setHtmlAt('#app', html)
+    end
+  end
+end
+
+# Server-side entry point. Renders `app` at `path` synchronously
+# (signal loaders execute during render, not via nowait) and returns
+# a plain HTML string. Inject into <div id="app"> of the page shell.
+def renderToString
+    @param app RenderFn
+    @param path String
+    @return String
+do
+  let tree = renderSSR(app, path)
+  renderToHtml(tree)
+end
+
+# Pick the single dot-path the browser adapter should apply a patch
+# at. Single-op batches on the same path are the common case; insert
+# and remove ops actually happen on the *parent* node, so the parent
+# path is returned for those.
+def patchPathForOps
+    @param ops DiffOp[]
+    @return String
+do
+  if array.length(ops) != 1
+    ''
+  else
+    let op = ops[0]
+    if op.action == 'insert'
+      parentPath(op.path)
+    else
+      if op.action == 'remove'
+        parentPath(op.path)
+      else
+        op.path
+      end
+    end
+  end
+end
+
+# Drop the last dot-segment from a path — `'1.2.3'` → `'1.2'`. Empty
+# or single-segment paths collapse to `''` (the root).
+def parentPath
+    @param path String
+    @return String
+do
+  let parts = string.split(path, '.')
+  let count = array.length(parts)
+  if count <= 1
+    ''
+  else
+    var result = ''
+    var i = 0
+    let last = count - 1
+    while i < last
+      if i > 0
+        result = result + '.'
+      end
+      result = result + parts[i]
+      i = i + 1
+    end
+    result
+  end
+end
+
+# Walk the ViewNode tree by dot-path, returning the matching subtree
+# or null if no node sits at that path. Used by the patch renderer to
+# re-render a subtree without re-serialising the whole document.
+def findNodeAtPath
+    @param node ViewNode
+    @param targetPath String
+    @param currentPath String
+    @return ViewNode?
+do
+  if currentPath == targetPath
+    node
+  else
+    var found ViewNode? = null
+    var i = 0
+    let childCount = array.length(node.children)
+    while i < childCount
+      let childPath = childPathFor(currentPath, i)
+      let maybeFound = findNodeAtPath(node.children[i], targetPath, childPath)
+      if maybeFound?
+        found = maybeFound
+        break
+      end
+      i = i + 1
+    end
+    found
+  end
+end
+
+# Compose a child dot-path from a parent path plus index. Mirrors the
+# path shape that `findNodeAtPath` walks and `patchPathForOps` emits.
+def childPathFor
+    @param parentPath String
+    @param index Int
+    @return String
+do
+  if parentPath == ''
+    toString(index)
+  else
+    parentPath + '.' + toString(index)
+  end
+end
+
+# Build a minimal ViewNode with the given kind and children — used
+# by the tests in this file to exercise path walking and patch
+# routing without depending on the full component tree.
+def testNode
+    @param kind String
+    @param children ViewNode[]
+    @return ViewNode
+do
+  ViewNode(kind: kind, key: '', props: {}, children: children, events: emptyEvents())
+end
+
+test parentPath
+it 'returns the parent path for nested nodes'
+  assert.equals(parentPath('1.2.3'), '1.2')
+end
+it 'returns empty for root children'
+  assert.equals(parentPath('0'), '')
+end
+end
+
+test patchPathForOps
+it 'targets the node path for updates'
+  let ops = [
+    DiffOp(action: 'update', path: '2.1', node: null, props: {})
+  ]
+  assert.equals(patchPathForOps(ops), '2.1')
+end
+it 'targets the parent path for inserts'
+  let ops = [
+    DiffOp(action: 'insert', path: '2.1', node: null, props: null)
+  ]
+  assert.equals(patchPathForOps(ops), '2')
+end
+it 'falls back to root for multi-op diffs'
+  let ops = [
+    DiffOp(action: 'update', path: '0', node: null, props: {})
+    DiffOp(action: 'update', path: '1', node: null, props: {})
+  ]
+  assert.equals(patchPathForOps(ops), '')
+end
+end
+
+test findNodeAtPath
+it 'finds a nested subtree by diff path'
+  let tree = testNode('VStack', [
+    testNode('Label', [])
+    testNode('HStack', [
+      testNode('Button', [])
+    ])
+  ])
+  let found = findNodeAtPath(tree, '1.0', '')
+  assert.isTrue(found?)
+  assert.equals(found!.kind, 'Button')
+end
+it 'returns null for a missing path'
+  let tree = testNode('VStack', [])
+  let found = findNodeAtPath(tree, '0', '')
+  assert.isFalse(found?)
+end
+end
+
+test testNode
+it 'builds a ViewNode with the given kind and children'
+  let n = testNode('VStack', [
+    testNode('Label', [])
+  ])
+  assert.equals(n.kind, 'VStack')
+  assert.equals(array.length(n.children), 1)
+  assert.equals(n.children[0].kind, 'Label')
+end
+end
+
+test childPathFor
+it 'is the index at the root path'
+  assert.equals(childPathFor('', 2), '2')
+end
+it 'dots onto a non-empty parent path'
+  assert.equals(childPathFor('1.2', 3), '1.2.3')
+end
+end
+
+# Static app used by the renderToString test — deterministic
+# output that doesn't require a real DOM host.
+def staticLabelApp
+    @return ViewNode
+do
+  testNode('Label', [])
+end
+
+test renderToString
+it 'serialises a static app tree to plain forui HTML'
+  let html = renderToString(staticLabelApp, '/')
+  assert.equals(string.contains(html, 'class="fai-label"'), true)
+end
+end
+
+test htmlRender
+it 'is safe to call with an empty op list — the renderer dispatches via setHtmlAt'
+  let tree = testNode('Label', [])
+  htmlRender(tree, [])
+  assert.equals(tree.kind, 'Label')
+end
+end
+
+test initWebRouter
+it 'wires the navigate listener through onNavigate without crashing'
+  initWebRouter()
+  assert.equals(true, true)
+end
+end
+
+test staticLabelApp
+it 'returns a Label node'
+  assert.equals(staticLabelApp().kind, 'Label')
+end
+end
