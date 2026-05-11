@@ -86,7 +86,19 @@ do
                                                                 if kind == 'Link'
                                                                     renderLink(node, path, includePath)
                                                                 else
-                                                                    renderDivWithClass(node, path, includePath, 'fai-view')
+                                                                    if kind == 'Pre'
+                                                                        renderPre(node, path, includePath)
+                                                                    else
+                                                                        if kind == 'Code'
+                                                                            renderCode(node, path, includePath)
+                                                                        else
+                                                                            if kind == 'Span'
+                                                                                renderSpan(node, path, includePath)
+                                                                            else
+                                                                                renderDivWithClass(node, path, includePath, 'fai-view')
+                                                                            end
+                                                                        end
+                                                                    end
                                                                 end
                                                             end
                                                         end
@@ -187,14 +199,46 @@ def renderDivWithClass
     @param className String
     @return String
 do
+    renderTagWithClass(node, path, includePath, 'div', className)
+end
+
+# Render a container node as a specific HTML tag, carrying its class,
+# style, key, and path attributes. Generalises renderDivWithClass so
+# semantic tags (`<pre>`, `<section>`, …) can reuse the same plumbing
+# without duplicating the attribute-building boilerplate.
+def renderTagWithClass
+    @param node ViewNode
+    @param path String
+    @param includePath Bool
+    @param tag String
+    @param className String
+    @return String
+do
     let modStyle = propsToStyle(node.props)
     let children = renderChildrenInternal(node, path, includePath)
     let attrs = nodeAttrs(node, path, includePath)
-    var out = '<div' + attrs + ' class="' + className + '"'
+    var out = '<' + tag + attrs + classAttr(node, className)
     if modStyle != ''
         out = out + ' style="' + modStyle + '"'
     end
-    out + '>' + children + '</div>'
+    out + '>' + children + '</' + tag + '>'
+end
+
+# Build the ` class="..."` attribute for a node, merging the
+# framework's kind-specific class with the optional user-supplied
+# `cssClass` prop set via the `cssClass` modifier. Returned string
+# starts with a leading space so callers can concatenate directly.
+def classAttr
+    @param node ViewNode
+    @param frameworkClass String
+    @return String
+do
+    let userClass = propOr(node.props, 'cssClass', '')
+    if userClass == ''
+        ' class="' + frameworkClass + '"'
+    else
+        ' class="' + frameworkClass + ' ' + userClass + '"'
+    end
 end
 
 # Render a Spacer — flex-grows to fill remaining space in its parent.
@@ -223,11 +267,57 @@ do
     let text = propOr(node.props, 'text', '')
     let style = propsToStyle(node.props)
     let attrs = nodeAttrs(node, path, includePath)
-    var out = '<span' + attrs + ' class="fai-label"'
+    var out = '<span' + attrs + classAttr(node, 'fai-label')
     if style != ''
         out = out + ' style="' + style + '"'
     end
     out + '>' + text + '</span>'
+end
+
+# Render a Span leaf. Counterpart to renderLabel — same shape, but a
+# `<span class="fai-span">` instead of `<span class="fai-label">`,
+# and explicitly designed to carry a `cssClass` to power
+# syntax-highlighted token streams (`fai-span tok-kw`, etc.).
+def renderSpan
+    @param node ViewNode
+    @param path String
+    @param includePath Bool
+    @return String
+do
+    let text = propOr(node.props, 'text', '')
+    let style = propsToStyle(node.props)
+    let attrs = nodeAttrs(node, path, includePath)
+    var out = '<span' + attrs + classAttr(node, 'fai-span')
+    if style != ''
+        out = out + ' style="' + style + '"'
+    end
+    out + '>' + text + '</span>'
+end
+
+# Render a Pre — preformatted text container. Emits a semantic
+# `<pre>` element so whitespace, font-family, and the platform's
+# default monospace styling apply automatically. Modifiers and
+# children flow through the same path as VStack/HStack containers.
+def renderPre
+    @param node ViewNode
+    @param path String
+    @param includePath Bool
+    @return String
+do
+    renderTagWithClass(node, path, includePath, 'pre', 'fai-pre')
+end
+
+# Render a Code container — `<code class="fai-code">{children}</code>`.
+# Children flow through the regular child renderer, so syntax-
+# highlighted token streams (`Span` leaves with `cssClass`) render
+# as `<span class="fai-span tok-kw">def</span>…` directly inside.
+def renderCode
+    @param node ViewNode
+    @param path String
+    @param includePath Bool
+    @return String
+do
+    renderTagWithClass(node, path, includePath, 'code', 'fai-code')
 end
 
 # Render a Button.
@@ -844,6 +934,115 @@ test renderDivWithClass
         let n = testNode('View', set({}, 'padding', 8), [])
         let html = renderDivWithClass(n, '', false, 'fai-view')
         assert.equals(string.contains(html, 'style="padding:8px;"'), true)
+    end
+end
+
+test renderTagWithClass
+    it 'emits the requested tag with the requested class'
+        let n = testNode('View', {}, [])
+        let html = renderTagWithClass(n, '', false, 'section', 'fai-section')
+        assert.equals(html, '<section class="fai-section"></section>')
+    end
+    it 'closes with a matching tag for non-div elements'
+        let inner = leaf('Code', set({}, 'text', 'x'))
+        let n = testNode('Pre', set({}, 'background', '#1b1b1b'), [inner])
+        let html = renderTagWithClass(n, '', false, 'pre', 'fai-pre')
+        assert.equals(string.contains(html, '<pre class="fai-pre"'), true)
+        assert.equals(string.contains(html, '</pre>'), true)
+        assert.equals(string.contains(html, 'style="background:#1b1b1b;"'), true)
+    end
+end
+
+test renderPre
+    it 'renders a Pre node as a semantic <pre class="fai-pre"> wrapper'
+        let inner = leaf('Span', set({}, 'text', 'let x = 1'))
+        let code = testNode('Code', {}, [inner])
+        let n = testNode('Pre', {}, [code])
+        let html = renderPre(n, '', false)
+        assert.equals(html, '<pre class="fai-pre"><code class="fai-code"><span class="fai-span">let x = 1</span></code></pre>')
+    end
+    it 'carries modifier styles as inline style on <pre>'
+        let n = testNode('Pre', set({}, 'padding', 16), [])
+        let html = renderPre(n, '', false)
+        assert.equals(string.contains(html, '<pre class="fai-pre" style="padding:16px;">'), true)
+    end
+end
+
+test renderCode
+    it 'renders a Code container with its children inside <code>'
+        let label = leaf('Label', set({}, 'text', 'fai run'))
+        let n = testNode('Code', {}, [label])
+        let html = renderCode(n, '', false)
+        assert.equals(html, '<code class="fai-code"><span class="fai-label">fai run</span></code>')
+    end
+    it 'wraps a sequence of Span tokens for highlighted code'
+        let kw = leaf('Span', set(set({}, 'text', 'def'), 'cssClass', 'tok-kw'))
+        let plain = leaf('Span', set({}, 'text', ' add'))
+        let n = testNode('Code', {}, [kw plain])
+        let html = renderCode(n, '', false)
+        assert.equals(html, '<code class="fai-code"><span class="fai-span tok-kw">def</span><span class="fai-span"> add</span></code>')
+    end
+    it 'folds modifier styles into the <code> tag'
+        let n = testNode('Code', set({}, 'fontSize', 13), [])
+        let html = renderCode(n, '', false)
+        assert.equals(html, '<code class="fai-code" style="font-size:13px;"></code>')
+    end
+    it 'appends a user cssClass to the framework class'
+        let n = testNode('Code', set({}, 'cssClass', 'shellcmd'), [])
+        let html = renderCode(n, '', false)
+        assert.equals(html, '<code class="fai-code shellcmd"></code>')
+    end
+end
+
+test renderSpan
+    it 'renders a Span leaf as a <span class="fai-span">'
+        let n = leaf('Span', set({}, 'text', 'def'))
+        let html = renderSpan(n, '', false)
+        assert.equals(html, '<span class="fai-span">def</span>')
+    end
+    it 'merges a token cssClass into the class attribute'
+        let props = set(set({}, 'text', 'def'), 'cssClass', 'tok-kw')
+        let n = leaf('Span', props)
+        let html = renderSpan(n, '', false)
+        assert.equals(html, '<span class="fai-span tok-kw">def</span>')
+    end
+    it 'preserves inline modifier styles alongside the merged class'
+        let props = set(set(set({}, 'text', 'styled'), 'cssClass', 'tok-fn'), 'foreground', '#f472b6')
+        let n = leaf('Span', props)
+        let html = renderSpan(n, '', false)
+        assert.equals(html, '<span class="fai-span tok-fn" style="color:#f472b6;">styled</span>')
+    end
+end
+
+test classAttr
+    it 'omits the user class when cssClass is absent'
+        let n = leaf('Span', set({}, 'text', 'x'))
+        assert.equals(classAttr(n, 'fai-span'), ' class="fai-span"')
+    end
+    it 'appends the user class when cssClass is present'
+        let n = leaf('Span', set(set({}, 'text', 'x'), 'cssClass', 'tok-kw'))
+        assert.equals(classAttr(n, 'fai-span'), ' class="fai-span tok-kw"')
+    end
+    it 'omits the user class when cssClass is the empty string'
+        let n = leaf('Span', set(set({}, 'text', 'x'), 'cssClass', ''))
+        assert.equals(classAttr(n, 'fai-span'), ' class="fai-span"')
+    end
+end
+
+test renderNodeHtml
+    it 'dispatches Pre + Code through renderNodeHtml end-to-end'
+        let span = leaf('Span', set({}, 'text', 'curl -fsSL ...'))
+        let code = testNode('Code', {}, [span])
+        let outer = testNode('Pre', {}, [code])
+        let html = renderToHtml(outer)
+        assert.equals(html, '<pre class="fai-pre"><code class="fai-code"><span class="fai-span">curl -fsSL ...</span></code></pre>')
+    end
+    it 'dispatches Span with cssClass through renderNodeHtml'
+        let kw = leaf('Span', set(set({}, 'text', 'def'), 'cssClass', 'tok-kw'))
+        let sp = leaf('Span', set({}, 'text', ' add'))
+        let outer = testNode('Pre', {}, [kw sp])
+        let html = renderToHtml(outer)
+        assert.equals(html, '<pre class="fai-pre"><span class="fai-span tok-kw">def</span><span class="fai-span"> add</span></pre>')
     end
 end
 
