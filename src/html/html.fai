@@ -13,7 +13,7 @@ def renderToHtml
     @param node ViewNode
     @return String
 do
-  renderNodeHtml(node, '', false)
+    renderNodeHtml(node, '', false)
 end
 
 # Render a ViewNode tree with stable path attributes for DOM patching.
@@ -22,7 +22,7 @@ def renderPatchHtml
     @param path String
     @return String
 do
-  renderNodeHtml(node, path, true)
+    renderNodeHtml(node, path, true)
 end
 
 # Internal renderer used by both plain HTML output and patch-aware output.
@@ -37,72 +37,72 @@ def renderNodeHtml
     @param includePath Bool
     @return String
 do
-  let kind = node.kind
-  if kind == 'Window'
-    renderChildrenInternal(node, path, includePath)
-  else
-    if kind == 'VStack'
-      renderDivWithClass(node, path, includePath, 'fai-vstack')
+    let kind = node.kind
+    if kind == 'Window'
+        renderChildrenInternal(node, path, includePath)
     else
-      if kind == 'HStack'
-        renderDivWithClass(node, path, includePath, 'fai-hstack')
-      else
-        if kind == 'ZStack'
-          renderDivWithClass(node, path, includePath, 'fai-zstack')
+        if kind == 'VStack'
+            renderDivWithClass(node, path, includePath, 'fai-vstack')
         else
-          if kind == 'View'
-            renderDivWithClass(node, path, includePath, 'fai-view')
-          else
-            if kind == 'Label'
-              renderLabel(node, path, includePath)
+            if kind == 'HStack'
+                renderDivWithClass(node, path, includePath, 'fai-hstack')
             else
-              if kind == 'Button'
-                renderButton(node, path, includePath)
-              else
-                if kind == 'Spacer'
-                  renderSpacer(node, path, includePath)
+                if kind == 'ZStack'
+                    renderDivWithClass(node, path, includePath, 'fai-zstack')
                 else
-                  if kind == 'TextInput'
-                    renderTextInput(node, path, includePath)
-                  else
-                    if kind == 'ScrollView'
-                      renderDivWithClass(node, path, includePath, 'fai-scrollview')
+                    if kind == 'View'
+                        renderDivWithClass(node, path, includePath, 'fai-view')
                     else
-                      if kind == 'Image'
-                        renderImage(node, path, includePath)
-                      else
-                        if kind == 'Toggle'
-                          renderToggle(node, path, includePath)
+                        if kind == 'Label'
+                            renderLabel(node, path, includePath)
                         else
-                          if kind == 'Divider'
-                            renderDivider(node, path, includePath)
-                          else
-                            if kind == 'SegmentedControl'
-                              renderSegmented(node, path, includePath)
+                            if kind == 'Button'
+                                renderButton(node, path, includePath)
                             else
-                              if kind == 'Router'
-                                renderRouter(node, path, includePath)
-                              else
-                                if kind == 'Link'
-                                  renderLink(node, path, includePath)
+                                if kind == 'Spacer'
+                                    renderSpacer(node, path, includePath)
                                 else
-                                  renderDivWithClass(node, path, includePath, 'fai-view')
+                                    if kind == 'TextInput'
+                                        renderTextInput(node, path, includePath)
+                                    else
+                                        if kind == 'ScrollView'
+                                            renderDivWithClass(node, path, includePath, 'fai-scrollview')
+                                        else
+                                            if kind == 'Image'
+                                                renderImage(node, path, includePath)
+                                            else
+                                                if kind == 'Toggle'
+                                                    renderToggle(node, path, includePath)
+                                                else
+                                                    if kind == 'Divider'
+                                                        renderDivider(node, path, includePath)
+                                                    else
+                                                        if kind == 'SegmentedControl'
+                                                            renderSegmented(node, path, includePath)
+                                                        else
+                                                            if kind == 'Router'
+                                                                renderRouter(node, path, includePath)
+                                                            else
+                                                                if kind == 'Link'
+                                                                    renderLink(node, path, includePath)
+                                                                else
+                                                                    renderDivWithClass(node, path, includePath, 'fai-view')
+                                                                end
+                                                            end
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
                                 end
-                              end
                             end
-                          end
                         end
-                      end
                     end
-                  end
                 end
-              end
             end
-          end
         end
-      end
     end
-  end
 end
 
 # Render children to concatenated HTML.
@@ -110,7 +110,7 @@ def renderChildren
     @param node ViewNode
     @return String
 do
-  renderChildrenInternal(node, '', false)
+    renderChildrenInternal(node, '', false)
 end
 
 # Render children to concatenated HTML using stable child paths.
@@ -120,15 +120,15 @@ def renderChildrenInternal
     @param includePath Bool
     @return String
 do
-  var html = ''
-  var i = 0
-  let childCount = array.length(node.children)
-  while i < childCount
-    let childPath = childPath(parentPath, i)
-    html = html + renderNodeHtml(node.children[i], childPath, includePath)
-    i = i + 1
-  end
-  html
+    var html = ''
+    var i = 0
+    let childCount = array.length(node.children)
+    while i < childCount
+        let childPath = childPath(parentPath, i)
+        html = html + renderNodeHtml(node.children[i], childPath, includePath)
+        i = i + 1
+    end
+    html
 end
 
 # Build a stable dot-path for a child index.
@@ -137,11 +137,11 @@ def childPath
     @param index Int
     @return String
 do
-  if parentPath == ''
-    toString(index)
-  else
-    parentPath + '.' + toString(index)
-  end
+    if parentPath == ''
+        toString(index)
+    else
+        parentPath + '.' + toString(index)
+    end
 end
 
 # Build node attributes used by the patch-aware HTML renderer.
@@ -151,7 +151,7 @@ def nodeAttrs
     @param includePath Bool
     @return String
 do
-  keyAttr(node) + pathAttr(path, includePath)
+    keyAttr(node) + pathAttr(path, includePath)
 end
 
 # Build a data-fai-key attribute string if the node has a key.
@@ -159,11 +159,11 @@ def keyAttr
     @param node ViewNode
     @return String
 do
-  if node.key != ''
-    ' data-fai-key="' + node.key + '"'
-  else
-    ''
-  end
+    if node.key != ''
+        ' data-fai-key="' + node.key + '"'
+    else
+        ''
+    end
 end
 
 # Build a data-fai-path attribute string when patch paths are enabled.
@@ -172,11 +172,11 @@ def pathAttr
     @param includePath Bool
     @return String
 do
-  if includePath
-    ' data-fai-path="' + path + '"'
-  else
-    ''
-  end
+    if includePath
+        ' data-fai-path="' + path + '"'
+    else
+        ''
+    end
 end
 
 # Render a div with a forui class + any user-modifier styles inline.
@@ -187,14 +187,14 @@ def renderDivWithClass
     @param className String
     @return String
 do
-  let modStyle = propsToStyle(node.props)
-  let children = renderChildrenInternal(node, path, includePath)
-  let attrs = nodeAttrs(node, path, includePath)
-  var out = '<div' + attrs + ' class="' + className + '"'
-  if modStyle != ''
-    out = out + ' style="' + modStyle + '"'
-  end
-  out + '>' + children + '</div>'
+    let modStyle = propsToStyle(node.props)
+    let children = renderChildrenInternal(node, path, includePath)
+    let attrs = nodeAttrs(node, path, includePath)
+    var out = '<div' + attrs + ' class="' + className + '"'
+    if modStyle != ''
+        out = out + ' style="' + modStyle + '"'
+    end
+    out + '>' + children + '</div>'
 end
 
 # Render a Spacer — flex-grows to fill remaining space in its parent.
@@ -204,13 +204,13 @@ def renderSpacer
     @param includePath Bool
     @return String
 do
-  let modStyle = propsToStyle(node.props)
-  let attrs = nodeAttrs(node, path, includePath)
-  var out = '<div' + attrs + ' class="fai-spacer"'
-  if modStyle != ''
-    out = out + ' style="' + modStyle + '"'
-  end
-  out + '></div>'
+    let modStyle = propsToStyle(node.props)
+    let attrs = nodeAttrs(node, path, includePath)
+    var out = '<div' + attrs + ' class="fai-spacer"'
+    if modStyle != ''
+        out = out + ' style="' + modStyle + '"'
+    end
+    out + '></div>'
 end
 
 # Render a Label.
@@ -220,14 +220,14 @@ def renderLabel
     @param includePath Bool
     @return String
 do
-  let text = propOr(node.props, 'text', '')
-  let style = propsToStyle(node.props)
-  let attrs = nodeAttrs(node, path, includePath)
-  var out = '<span' + attrs + ' class="fai-label"'
-  if style != ''
-    out = out + ' style="' + style + '"'
-  end
-  out + '>' + text + '</span>'
+    let text = propOr(node.props, 'text', '')
+    let style = propsToStyle(node.props)
+    let attrs = nodeAttrs(node, path, includePath)
+    var out = '<span' + attrs + ' class="fai-label"'
+    if style != ''
+        out = out + ' style="' + style + '"'
+    end
+    out + '>' + text + '</span>'
 end
 
 # Render a Button.
@@ -237,17 +237,17 @@ def renderButton
     @param includePath Bool
     @return String
 do
-  let text = propOr(node.props, 'text', '')
-  let modStyle = propsToStyle(node.props)
-  var attrs = nodeAttrs(node, path, includePath) + ' class="fai-button"'
-  if modStyle != ''
-    attrs = attrs + ' style="' + modStyle + '"'
-  end
-  if hasKey(node.props, 'handlerId')
-    let handlerId = toString(getInt(node.props, 'handlerId'))
-    attrs = attrs + ' onclick="handleEvent(' + handlerId + ')"'
-  end
-  '<button' + attrs + '>' + text + '</button>'
+    let text = propOr(node.props, 'text', '')
+    let modStyle = propsToStyle(node.props)
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-button"'
+    if modStyle != ''
+        attrs = attrs + ' style="' + modStyle + '"'
+    end
+    if hasKey(node.props, 'handlerId')
+        let handlerId = toString(getInt(node.props, 'handlerId'))
+        attrs = attrs + ' onclick="handleEvent(' + handlerId + ')"'
+    end
+    '<button' + attrs + '>' + text + '</button>'
 end
 
 # Render a TextInput.
@@ -257,25 +257,25 @@ def renderTextInput
     @param includePath Bool
     @return String
 do
-  let placeholder = propOr(node.props, 'placeholder', '')
-  let value = propOr(node.props, 'value', '')
-  let inputType = propOr(node.props, 'inputType', 'text')
-  let modStyle = propsToStyle(node.props)
-  var attrs = nodeAttrs(node, path, includePath) + ' class="fai-textinput"'
-  if modStyle != ''
-    attrs = attrs + ' style="' + modStyle + '"'
-  end
-  attrs = attrs + ' placeholder="' + placeholder + '"'
-  attrs = attrs + ' value="' + value + '"'
-  if hasKey(node.props, 'changeHandlerId')
-    let changeId = toString(getInt(node.props, 'changeHandlerId'))
-    attrs = attrs + ' oninput="handleInputEvent(' + changeId + ',this.value)"'
-  end
-  if hasKey(node.props, 'submitHandlerId')
-    let submitId = toString(getInt(node.props, 'submitHandlerId'))
-    attrs = attrs + ' onkeydown="if(event.key===\'Enter\'){handleSubmitEvent(' + submitId + ')}"'
-  end
-  '<input type="' + inputType + '"' + attrs + '/>'
+    let placeholder = propOr(node.props, 'placeholder', '')
+    let value = propOr(node.props, 'value', '')
+    let inputType = propOr(node.props, 'inputType', 'text')
+    let modStyle = propsToStyle(node.props)
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-textinput"'
+    if modStyle != ''
+        attrs = attrs + ' style="' + modStyle + '"'
+    end
+    attrs = attrs + ' placeholder="' + placeholder + '"'
+    attrs = attrs + ' value="' + value + '"'
+    if hasKey(node.props, 'changeHandlerId')
+        let changeId = toString(getInt(node.props, 'changeHandlerId'))
+        attrs = attrs + ' oninput="handleInputEvent(' + changeId + ',this.value)"'
+    end
+    if hasKey(node.props, 'submitHandlerId')
+        let submitId = toString(getInt(node.props, 'submitHandlerId'))
+        attrs = attrs + ' onkeydown="if(event.key===\'Enter\'){handleSubmitEvent(' + submitId + ')}"'
+    end
+    '<input type="' + inputType + '"' + attrs + '/>'
 end
 
 # Render an Image.
@@ -285,13 +285,13 @@ def renderImage
     @param includePath Bool
     @return String
 do
-  let src = propOr(node.props, 'src', '')
-  let modStyle = propsToStyle(node.props)
-  var attrs = nodeAttrs(node, path, includePath) + ' class="fai-image"'
-  if modStyle != ''
-    attrs = attrs + ' style="' + modStyle + '"'
-  end
-  '<img' + attrs + ' src="' + src + '"/>'
+    let src = propOr(node.props, 'src', '')
+    let modStyle = propsToStyle(node.props)
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-image"'
+    if modStyle != ''
+        attrs = attrs + ' style="' + modStyle + '"'
+    end
+    '<img' + attrs + ' src="' + src + '"/>'
 end
 
 # Render a Toggle. iOS-style track + thumb driven by the data-on attr.
@@ -302,20 +302,20 @@ def renderToggle
     @param includePath Bool
     @return String
 do
-  let isOn = propOr(node.props, 'on', 'false')
-  let modStyle = propsToStyle(node.props)
-  var attrs = nodeAttrs(node, path, includePath) + ' class="fai-toggle"'
-  attrs = attrs + ' role="switch"'
-  attrs = attrs + ' aria-checked="' + isOn + '"'
-  attrs = attrs + ' data-on="' + isOn + '"'
-  if modStyle != ''
-    attrs = attrs + ' style="' + modStyle + '"'
-  end
-  if hasKey(node.props, 'handlerId')
-    let handlerId = toString(getInt(node.props, 'handlerId'))
-    attrs = attrs + ' onclick="handleEvent(' + handlerId + ')"'
-  end
-  '<button' + attrs + '></button>'
+    let isOn = propOr(node.props, 'on', 'false')
+    let modStyle = propsToStyle(node.props)
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-toggle"'
+    attrs = attrs + ' role="switch"'
+    attrs = attrs + ' aria-checked="' + isOn + '"'
+    attrs = attrs + ' data-on="' + isOn + '"'
+    if modStyle != ''
+        attrs = attrs + ' style="' + modStyle + '"'
+    end
+    if hasKey(node.props, 'handlerId')
+        let handlerId = toString(getInt(node.props, 'handlerId'))
+        attrs = attrs + ' onclick="handleEvent(' + handlerId + ')"'
+    end
+    '<button' + attrs + '></button>'
 end
 
 # Render a Divider — a 1px horizontal rule.
@@ -325,12 +325,12 @@ def renderDivider
     @param includePath Bool
     @return String
 do
-  let modStyle = propsToStyle(node.props)
-  var attrs = nodeAttrs(node, path, includePath) + ' class="fai-divider"'
-  if modStyle != ''
-    attrs = attrs + ' style="' + modStyle + '"'
-  end
-  '<hr' + attrs + '/>'
+    let modStyle = propsToStyle(node.props)
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-divider"'
+    if modStyle != ''
+        attrs = attrs + ' style="' + modStyle + '"'
+    end
+    '<hr' + attrs + '/>'
 end
 
 # Render a SegmentedControl. Each child is a Segment (see view.fai)
@@ -341,21 +341,21 @@ def renderSegmented
     @param includePath Bool
     @return String
 do
-  let modStyle = propsToStyle(node.props)
-  var out = '<div' + nodeAttrs(node, path, includePath) + ' class="fai-segmented"'
-  if modStyle != ''
-    out = out + ' style="' + modStyle + '"'
-  end
-  out = out + ' role="tablist">'
-  var i = 0
-  let childCount = array.length(node.children)
-  while i < childCount
-    let child = node.children[i]
-    let segPath = childPath(path, i)
-    out = out + renderSegment(child, segPath, includePath)
-    i = i + 1
-  end
-  out + '</div>'
+    let modStyle = propsToStyle(node.props)
+    var out = '<div' + nodeAttrs(node, path, includePath) + ' class="fai-segmented"'
+    if modStyle != ''
+        out = out + ' style="' + modStyle + '"'
+    end
+    out = out + ' role="tablist">'
+    var i = 0
+    let childCount = array.length(node.children)
+    while i < childCount
+        let child = node.children[i]
+        let segPath = childPath(path, i)
+        out = out + renderSegment(child, segPath, includePath)
+        i = i + 1
+    end
+    out + '</div>'
 end
 
 # Render a single Segment child of a SegmentedControl.
@@ -365,17 +365,17 @@ def renderSegment
     @param includePath Bool
     @return String
 do
-  let text = propOr(node.props, 'text', '')
-  let selected = propOr(node.props, 'selected', 'false')
-  var attrs = nodeAttrs(node, path, includePath) + ' class="fai-segment"'
-  attrs = attrs + ' role="tab"'
-  attrs = attrs + ' data-selected="' + selected + '"'
-  attrs = attrs + ' aria-selected="' + selected + '"'
-  if hasKey(node.props, 'handlerId')
-    let handlerId = toString(getInt(node.props, 'handlerId'))
-    attrs = attrs + ' onclick="handleEvent(' + handlerId + ')"'
-  end
-  '<button' + attrs + '>' + text + '</button>'
+    let text = propOr(node.props, 'text', '')
+    let selected = propOr(node.props, 'selected', 'false')
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-segment"'
+    attrs = attrs + ' role="tab"'
+    attrs = attrs + ' data-selected="' + selected + '"'
+    attrs = attrs + ' aria-selected="' + selected + '"'
+    if hasKey(node.props, 'handlerId')
+        let handlerId = toString(getInt(node.props, 'handlerId'))
+        attrs = attrs + ' onclick="handleEvent(' + handlerId + ')"'
+    end
+    '<button' + attrs + '>' + text + '</button>'
 end
 
 # ── Router & Link ──────────────────────────────────────────────────
@@ -387,15 +387,15 @@ def renderRouter
     @param includePath Bool
     @return String
 do
-  let transition = propOr(node.props, 'transition', 'none')
-  let modStyle = propsToStyle(node.props)
-  let children = renderChildrenInternal(node, path, includePath)
-  let attrs = nodeAttrs(node, path, includePath)
-  var out = '<div' + attrs + ' class="fai-router" data-transition="' + transition + '"'
-  if modStyle != ''
-    out = out + ' style="' + modStyle + '"'
-  end
-  out + '>' + children + '</div>'
+    let transition = propOr(node.props, 'transition', 'none')
+    let modStyle = propsToStyle(node.props)
+    let children = renderChildrenInternal(node, path, includePath)
+    let attrs = nodeAttrs(node, path, includePath)
+    var out = '<div' + attrs + ' class="fai-router" data-transition="' + transition + '"'
+    if modStyle != ''
+        out = out + ' style="' + modStyle + '"'
+    end
+    out + '>' + children + '</div>'
 end
 
 # Render a Link as an <a> tag. The href enables right-click "open in
@@ -407,19 +407,19 @@ def renderLink
     @param includePath Bool
     @return String
 do
-  let to = propOr(node.props, 'to', '/')
-  let modStyle = propsToStyle(node.props)
-  let children = renderChildrenInternal(node, path, includePath)
-  var attrs = nodeAttrs(node, path, includePath) + ' class="fai-link"'
-  attrs = attrs + ' href="' + to + '"'
-  if modStyle != ''
-    attrs = attrs + ' style="' + modStyle + '"'
-  end
-  if hasKey(node.props, 'handlerId')
-    let handlerId = toString(getInt(node.props, 'handlerId'))
-    attrs = attrs + ' onclick="event.preventDefault();handleEvent(' + handlerId + ')"'
-  end
-  '<a' + attrs + '>' + children + '</a>'
+    let to = propOr(node.props, 'to', '/')
+    let modStyle = propsToStyle(node.props)
+    let children = renderChildrenInternal(node, path, includePath)
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-link"'
+    attrs = attrs + ' href="' + to + '"'
+    if modStyle != ''
+        attrs = attrs + ' style="' + modStyle + '"'
+    end
+    if hasKey(node.props, 'handlerId')
+        let handlerId = toString(getInt(node.props, 'handlerId'))
+        attrs = attrs + ' onclick="event.preventDefault();handleEvent(' + handlerId + ')"'
+    end
+    '<a' + attrs + '>' + children + '</a>'
 end
 
 # ── Style helpers ───────────────────────────────────────────────────
@@ -428,44 +428,75 @@ def propsToStyle
     @param props Dictionary
     @return String
 do
-  var style = ''
-  if hasKey(props, 'padding')
-    style = style + 'padding:' + toString(getInt(props, 'padding')) + 'px;'
-  end
-  if hasKey(props, 'background')
-    let bg = getString(props, 'background')
-    style = style + 'background:' + unwrap(bg, '') + ';'
-  end
-  if hasKey(props, 'foreground')
-    let fg = getString(props, 'foreground')
-    style = style + 'color:' + unwrap(fg, '') + ';'
-  end
-  if hasKey(props, 'cornerRadius')
-    style = style + 'border-radius:' + toString(getInt(props, 'cornerRadius')) + 'px;'
-  end
-  if hasKey(props, 'fontSize')
-    style = style + 'font-size:' + toString(getInt(props, 'fontSize')) + 'px;'
-  end
-  if hasKey(props, 'fontWeight')
-    let fw = getString(props, 'fontWeight')
-    style = style + 'font-weight:' + unwrap(fw, '') + ';'
-  end
-  if hasKey(props, 'opacity')
-    style = style + 'opacity:' + toString(getInt(props, 'opacity')) + ';'
-  end
-  if hasKey(props, 'flex')
-    let fl = getString(props, 'flex')
-    style = style + 'flex:' + unwrap(fl, '') + ';'
-  end
-  if hasKey(props, 'width')
-    let w = getString(props, 'width')
-    style = style + 'width:' + unwrap(w, '') + ';'
-  end
-  if hasKey(props, 'maxWidth')
-    let mw = getString(props, 'maxWidth')
-    style = style + 'max-width:' + unwrap(mw, '') + ';'
-  end
-  style
+    var style = ''
+    if hasKey(props, 'padding')
+        style = style + 'padding:' + toString(getInt(props, 'padding')) + 'px;'
+    end
+    if hasKey(props, 'paddingTop')
+        style = style + 'padding-top:' + toString(getInt(props, 'paddingTop')) + 'px;'
+    end
+    if hasKey(props, 'paddingRight')
+        style = style + 'padding-right:' + toString(getInt(props, 'paddingRight')) + 'px;'
+    end
+    if hasKey(props, 'paddingBottom')
+        style = style + 'padding-bottom:' + toString(getInt(props, 'paddingBottom')) + 'px;'
+    end
+    if hasKey(props, 'paddingLeft')
+        style = style + 'padding-left:' + toString(getInt(props, 'paddingLeft')) + 'px;'
+    end
+    if hasKey(props, 'margin')
+        style = style + 'margin:' + toString(getInt(props, 'margin')) + 'px;'
+    end
+    if hasKey(props, 'marginTop')
+        style = style + 'margin-top:' + toString(getInt(props, 'marginTop')) + 'px;'
+    end
+    if hasKey(props, 'marginRight')
+        style = style + 'margin-right:' + toString(getInt(props, 'marginRight')) + 'px;'
+    end
+    if hasKey(props, 'marginBottom')
+        style = style + 'margin-bottom:' + toString(getInt(props, 'marginBottom')) + 'px;'
+    end
+    if hasKey(props, 'marginLeft')
+        style = style + 'margin-left:' + toString(getInt(props, 'marginLeft')) + 'px;'
+    end
+    if hasKey(props, 'background')
+        let bg = getString(props, 'background')
+        style = style + 'background:' + unwrap(bg, '') + ';'
+    end
+    if hasKey(props, 'foreground')
+        let fg = getString(props, 'foreground')
+        style = style + 'color:' + unwrap(fg, '') + ';'
+    end
+    if hasKey(props, 'cornerRadius')
+        style = style + 'border-radius:' + toString(getInt(props, 'cornerRadius')) + 'px;'
+    end
+    if hasKey(props, 'borderWidth')
+        let bc = getString(props, 'borderColor')
+        style = style + 'border:' + toString(getInt(props, 'borderWidth')) + 'px solid ' + unwrap(bc, 'currentColor') + ';'
+    end
+    if hasKey(props, 'fontSize')
+        style = style + 'font-size:' + toString(getInt(props, 'fontSize')) + 'px;'
+    end
+    if hasKey(props, 'fontWeight')
+        let fw = getString(props, 'fontWeight')
+        style = style + 'font-weight:' + unwrap(fw, '') + ';'
+    end
+    if hasKey(props, 'opacity')
+        style = style + 'opacity:' + toString(getInt(props, 'opacity')) + ';'
+    end
+    if hasKey(props, 'flex')
+        let fl = getString(props, 'flex')
+        style = style + 'flex:' + unwrap(fl, '') + ';'
+    end
+    if hasKey(props, 'width')
+        let w = getString(props, 'width')
+        style = style + 'width:' + unwrap(w, '') + ';'
+    end
+    if hasKey(props, 'maxWidth')
+        let mw = getString(props, 'maxWidth')
+        style = style + 'max-width:' + unwrap(mw, '') + ';'
+    end
+    style
 end
 
 # Get a string prop with a default.
@@ -475,8 +506,8 @@ def propOr
     @param fallback String
     @return String
 do
-  let val = getString(props, key)
-  unwrap(val, fallback)
+    let val = getString(props, key)
+    unwrap(val, fallback)
 end
 
 # ── Tests ───────────────────────────────────────────────────────────
@@ -487,7 +518,7 @@ def testNode
     @param children ViewNode[]
     @return ViewNode
 do
-  ViewNode(kind: kind, key: '', props: props, children: children, events: emptyEvents())
+    ViewNode(kind: kind, key: '', props: props, children: children, events: emptyEvents())
 end
 
 # Leaf node.
@@ -496,405 +527,429 @@ def leaf
     @param props Dictionary
     @return ViewNode
 do
-  testNode(kind, props, [])
+    testNode(kind, props, [])
 end
 
 test renderLabel
-it 'renders a label as a class-bearing span'
-  let node = leaf('Label', set({}, 'text', 'hello'))
-  let html = renderToHtml(node)
-  assert.equals(html, '<span class="fai-label">hello</span>')
-end
-it 'renders a label with modifier style inline'
-  let props = set(set({}, 'text', 'styled'), 'fontSize', 24)
-  let node = leaf('Label', props)
-  let html = renderToHtml(node)
-  assert.equals(html, '<span class="fai-label" style="font-size:24px;">styled</span>')
-end
-end
-
-test renderToHtml
-it 'renders a button with the fai-button class (base style lives in forui.css)'
-  let node = leaf('Button', set({}, 'text', 'Click'))
-  let html = renderToHtml(node)
-  assert.equals(html, '<button class="fai-button">Click</button>')
-end
+    it 'renders a label as a class-bearing span'
+        let node = leaf('Label', set({}, 'text', 'hello'))
+        let html = renderToHtml(node)
+        assert.equals(html, '<span class="fai-label">hello</span>')
+    end
+    it 'renders a label with modifier style inline'
+        let props = set(set({}, 'text', 'styled'), 'fontSize', 24)
+        let node = leaf('Label', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<span class="fai-label" style="font-size:24px;">styled</span>')
+    end
 end
 
 test renderToHtml
-it 'renders a VStack as flex column div (class-based)'
-  let node = testNode('VStack', {}, [
-    leaf('Label', set({}, 'text', 'one'))
-    leaf('Label', set({}, 'text', 'two'))
-  ])
-  let html = renderToHtml(node)
-  assert.equals(html, '<div class="fai-vstack"><span class="fai-label">one</span><span class="fai-label">two</span></div>')
-end
+    it 'renders a button with the fai-button class (base style lives in forui.css)'
+        let node = leaf('Button', set({}, 'text', 'Click'))
+        let html = renderToHtml(node)
+        assert.equals(html, '<button class="fai-button">Click</button>')
+    end
 end
 
 test renderToHtml
-it 'renders an HStack as flex row div (class-based)'
-  let node = testNode('HStack', {}, [
-    leaf('Button', set({}, 'text', 'A'))
-    leaf('Button', set({}, 'text', 'B'))
-  ])
-  let html = renderToHtml(node)
-  assert.equals(html, '<div class="fai-hstack"><button class="fai-button">A</button><button class="fai-button">B</button></div>')
-end
-end
-
-test renderToHtml
-it 'renders a nested tree'
-  let node = testNode('VStack', {}, [
-    leaf('Label', set({}, 'text', 'Title'))
-    testNode('HStack', {}, [
-      leaf('Button', set({}, 'text', 'Save'))
-      leaf('Button', set({}, 'text', 'Cancel'))
-    ])
-  ])
-  let html = renderToHtml(node)
-  assert.equals(html, '<div class="fai-vstack"><span class="fai-label">Title</span><div class="fai-hstack"><button class="fai-button">Save</button><button class="fai-button">Cancel</button></div></div>')
-end
+    it 'renders a VStack as flex column div (class-based)'
+        let node = testNode('VStack', {}, [
+            leaf('Label', set({}, 'text', 'one'))
+            leaf('Label', set({}, 'text', 'two'))
+        ])
+        let html = renderToHtml(node)
+        assert.equals(html, '<div class="fai-vstack"><span class="fai-label">one</span><span class="fai-label">two</span></div>')
+    end
 end
 
 test renderToHtml
-it 'renders a spacer with fai-spacer class'
-  let node = leaf('Spacer', {})
-  let html = renderToHtml(node)
-  assert.equals(html, '<div class="fai-spacer"></div>')
-end
-end
-
-test renderToHtml
-it 'renders a text input with default type'
-  let node = leaf('TextInput', set({}, 'placeholder', 'Type here...'))
-  let html = renderToHtml(node)
-  assert.equals(html, '<input type="text" class="fai-textinput" placeholder="Type here..." value=""/>')
-end
-it 'renders inputType from props'
-  let props = set(set({}, 'placeholder', 'you@example.com'), 'inputType', 'email')
-  let node = leaf('TextInput', props)
-  let html = renderToHtml(node)
-  assert.equals(html, '<input type="email" class="fai-textinput" placeholder="you@example.com" value=""/>')
-end
-it 'renders password inputType'
-  let props = set(set({}, 'placeholder', 'Password'), 'inputType', 'password')
-  let node = leaf('TextInput', props)
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'type="password"'), true)
-end
-it 'emits onkeydown enter handler when submitHandlerId is set'
-  let props = set(set(set({}, 'placeholder', 'x'), 'inputType', 'text'), 'submitHandlerId', 7)
-  let node = leaf('TextInput', props)
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'onkeydown="if(event.key===\'Enter\'){handleSubmitEvent(7)}"'), true)
-end
-it 'omits onkeydown when submitHandlerId is absent'
-  let node = leaf('TextInput', set({}, 'placeholder', 'x'))
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'onkeydown'), false)
-end
+    it 'renders an HStack as flex row div (class-based)'
+        let node = testNode('HStack', {}, [
+            leaf('Button', set({}, 'text', 'A'))
+            leaf('Button', set({}, 'text', 'B'))
+        ])
+        let html = renderToHtml(node)
+        assert.equals(html, '<div class="fai-hstack"><button class="fai-button">A</button><button class="fai-button">B</button></div>')
+    end
 end
 
 test renderToHtml
-it 'renders padding and background as inline style so user modifiers win'
-  let props = set(set(set({}, 'text', 'styled'), 'padding', 10), 'background', 'blue')
-  let node = leaf('Label', props)
-  let html = renderToHtml(node)
-  assert.equals(html, '<span class="fai-label" style="padding:10px;background:blue;">styled</span>')
-end
-end
-
-test renderToHtml
-it 'renders a Toggle with data-on=false by default'
-  let node = leaf('Toggle', {})
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'class="fai-toggle"'), true)
-  assert.equals(string.contains(html, 'data-on="false"'), true)
-  assert.equals(string.contains(html, 'role="switch"'), true)
-end
-it 'renders a Toggle with data-on=true when on prop is true'
-  let node = leaf('Toggle', set({}, 'on', 'true'))
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'data-on="true"'), true)
-  assert.equals(string.contains(html, 'aria-checked="true"'), true)
-end
+    it 'renders a nested tree'
+        let node = testNode('VStack', {}, [
+            leaf('Label', set({}, 'text', 'Title'))
+            testNode('HStack', {}, [
+                leaf('Button', set({}, 'text', 'Save'))
+                leaf('Button', set({}, 'text', 'Cancel'))
+            ])
+        ])
+        let html = renderToHtml(node)
+        assert.equals(html, '<div class="fai-vstack"><span class="fai-label">Title</span><div class="fai-hstack"><button class="fai-button">Save</button><button class="fai-button">Cancel</button></div></div>')
+    end
 end
 
 test renderToHtml
-it 'renders a Divider as an hr with class'
-  let node = leaf('Divider', {})
-  let html = renderToHtml(node)
-  assert.equals(html, '<hr class="fai-divider"/>')
-end
+    it 'renders a spacer with fai-spacer class'
+        let node = leaf('Spacer', {})
+        let html = renderToHtml(node)
+        assert.equals(html, '<div class="fai-spacer"></div>')
+    end
 end
 
 test renderToHtml
-it 'renders a SegmentedControl with segments'
-  let seg1 = leaf('Segment', set(set({}, 'text', 'Day'), 'selected', 'true'))
-  let seg2 = leaf('Segment', set(set({}, 'text', 'Week'), 'selected', 'false'))
-  let node = testNode('SegmentedControl', {}, [seg1 seg2])
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'class="fai-segmented"'), true)
-  assert.equals(string.contains(html, 'class="fai-segment"'), true)
-  assert.equals(string.contains(html, 'data-selected="true"'), true)
-  assert.equals(string.contains(html, 'data-selected="false"'), true)
-  assert.equals(string.contains(html, '>Day<'), true)
-  assert.equals(string.contains(html, '>Week<'), true)
+    it 'renders a text input with default type'
+        let node = leaf('TextInput', set({}, 'placeholder', 'Type here...'))
+        let html = renderToHtml(node)
+        assert.equals(html, '<input type="text" class="fai-textinput" placeholder="Type here..." value=""/>')
+    end
+    it 'renders inputType from props'
+        let props = set(set({}, 'placeholder', 'you@example.com'), 'inputType', 'email')
+        let node = leaf('TextInput', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<input type="email" class="fai-textinput" placeholder="you@example.com" value=""/>')
+    end
+    it 'renders password inputType'
+        let props = set(set({}, 'placeholder', 'Password'), 'inputType', 'password')
+        let node = leaf('TextInput', props)
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'type="password"'), true)
+    end
+    it 'emits onkeydown enter handler when submitHandlerId is set'
+        let props = set(set(set({}, 'placeholder', 'x'), 'inputType', 'text'), 'submitHandlerId', 7)
+        let node = leaf('TextInput', props)
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'onkeydown="if(event.key===\'Enter\'){handleSubmitEvent(7)}"'), true)
+    end
+    it 'omits onkeydown when submitHandlerId is absent'
+        let node = leaf('TextInput', set({}, 'placeholder', 'x'))
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'onkeydown'), false)
+    end
 end
+
+test renderToHtml
+    it 'renders padding and background as inline style so user modifiers win'
+        let props = set(set(set({}, 'text', 'styled'), 'padding', 10), 'background', 'blue')
+        let node = leaf('Label', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<span class="fai-label" style="padding:10px;background:blue;">styled</span>')
+    end
+end
+
+test renderToHtml
+    it 'renders a Toggle with data-on=false by default'
+        let node = leaf('Toggle', {})
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'class="fai-toggle"'), true)
+        assert.equals(string.contains(html, 'data-on="false"'), true)
+        assert.equals(string.contains(html, 'role="switch"'), true)
+    end
+    it 'renders a Toggle with data-on=true when on prop is true'
+        let node = leaf('Toggle', set({}, 'on', 'true'))
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'data-on="true"'), true)
+        assert.equals(string.contains(html, 'aria-checked="true"'), true)
+    end
+end
+
+test renderToHtml
+    it 'renders a Divider as an hr with class'
+        let node = leaf('Divider', {})
+        let html = renderToHtml(node)
+        assert.equals(html, '<hr class="fai-divider"/>')
+    end
+end
+
+test renderToHtml
+    it 'renders a SegmentedControl with segments'
+        let seg1 = leaf('Segment', set(set({}, 'text', 'Day'), 'selected', 'true'))
+        let seg2 = leaf('Segment', set(set({}, 'text', 'Week'), 'selected', 'false'))
+        let node = testNode('SegmentedControl', {}, [seg1 seg2])
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'class="fai-segmented"'), true)
+        assert.equals(string.contains(html, 'class="fai-segment"'), true)
+        assert.equals(string.contains(html, 'data-selected="true"'), true)
+        assert.equals(string.contains(html, 'data-selected="false"'), true)
+        assert.equals(string.contains(html, '>Day<'), true)
+        assert.equals(string.contains(html, '>Week<'), true)
+    end
 end
 
 test renderRouter
-it 'renders a Router with transition attribute'
-  let child = leaf('Label', set({}, 'text', 'Home'))
-  let props = set(set({}, 'transition', 'fade'), 'currentPath', '/')
-  let node = testNode('Router', props, [child])
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'class="fai-router"'), true)
-  assert.equals(string.contains(html, 'data-transition="fade"'), true)
-  assert.equals(string.contains(html, '>Home<'), true)
-end
-it 'defaults transition to none'
-  let node = testNode('Router', {}, [])
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'data-transition="none"'), true)
-end
+    it 'renders a Router with transition attribute'
+        let child = leaf('Label', set({}, 'text', 'Home'))
+        let props = set(set({}, 'transition', 'fade'), 'currentPath', '/')
+        let node = testNode('Router', props, [child])
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'class="fai-router"'), true)
+        assert.equals(string.contains(html, 'data-transition="fade"'), true)
+        assert.equals(string.contains(html, '>Home<'), true)
+    end
+    it 'defaults transition to none'
+        let node = testNode('Router', {}, [])
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'data-transition="none"'), true)
+    end
 end
 
 test renderLink
-it 'renders a Link as an anchor tag with href'
-  let child = leaf('Label', set({}, 'text', 'Settings'))
-  let props = set(set({}, 'to', '/settings'), 'handlerId', 5)
-  let node = testNode('Link', props, [child])
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, '<a'), true)
-  assert.equals(string.contains(html, 'href="/settings"'), true)
-  assert.equals(string.contains(html, 'class="fai-link"'), true)
-  assert.equals(string.contains(html, 'event.preventDefault()'), true)
-  assert.equals(string.contains(html, '>Settings<'), true)
-end
-it 'renders a Link without handler when no handlerId'
-  let props = set({}, 'to', '/about')
-  let node = testNode('Link', props, [])
-  let html = renderToHtml(node)
-  assert.equals(string.contains(html, 'href="/about"'), true)
-  assert.equals(string.contains(html, 'onclick'), false)
-end
+    it 'renders a Link as an anchor tag with href'
+        let child = leaf('Label', set({}, 'text', 'Settings'))
+        let props = set(set({}, 'to', '/settings'), 'handlerId', 5)
+        let node = testNode('Link', props, [child])
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, '<a'), true)
+        assert.equals(string.contains(html, 'href="/settings"'), true)
+        assert.equals(string.contains(html, 'class="fai-link"'), true)
+        assert.equals(string.contains(html, 'event.preventDefault()'), true)
+        assert.equals(string.contains(html, '>Settings<'), true)
+    end
+    it 'renders a Link without handler when no handlerId'
+        let props = set({}, 'to', '/about')
+        let node = testNode('Link', props, [])
+        let html = renderToHtml(node)
+        assert.equals(string.contains(html, 'href="/about"'), true)
+        assert.equals(string.contains(html, 'onclick'), false)
+    end
 end
 
 test renderPatchHtml
-it 'renders path attributes for subtree patching'
-  let node = testNode('VStack', {}, [
-    leaf('Label', set({}, 'text', 'one'))
-    leaf('Button', set({}, 'text', 'two'))
-  ])
-  let html = renderPatchHtml(node, '3')
-  assert.equals(html, '<div data-fai-path="3" class="fai-vstack"><span data-fai-path="3.0" class="fai-label">one</span><button data-fai-path="3.1" class="fai-button">two</button></div>')
-end
-it 'keeps keyed nodes and paths together'
-  let node = ViewNode(kind: 'Label', key: 'item-1', props: set({}, 'text', 'hello'), children: [], events: emptyEvents())
-  let html = renderPatchHtml(node, '0')
-  assert.equals(html, '<span data-fai-key="item-1" data-fai-path="0" class="fai-label">hello</span>')
-end
+    it 'renders path attributes for subtree patching'
+        let node = testNode('VStack', {}, [
+            leaf('Label', set({}, 'text', 'one'))
+            leaf('Button', set({}, 'text', 'two'))
+        ])
+        let html = renderPatchHtml(node, '3')
+        assert.equals(html, '<div data-fai-path="3" class="fai-vstack"><span data-fai-path="3.0" class="fai-label">one</span><button data-fai-path="3.1" class="fai-button">two</button></div>')
+    end
+    it 'keeps keyed nodes and paths together'
+        let node = ViewNode(kind: 'Label', key: 'item-1', props: set({}, 'text', 'hello'), children: [], events: emptyEvents())
+        let html = renderPatchHtml(node, '0')
+        assert.equals(html, '<span data-fai-key="item-1" data-fai-path="0" class="fai-label">hello</span>')
+    end
 end
 
 test testNode
-it 'builds a ViewNode with the given kind, props, and children'
-  let n = testNode('VStack', {}, [])
-  assert.equals(n.kind, 'VStack')
-  assert.equals(n.key, '')
-  assert.equals(array.length(n.children), 0)
-end
+    it 'builds a ViewNode with the given kind, props, and children'
+        let n = testNode('VStack', {}, [])
+        assert.equals(n.kind, 'VStack')
+        assert.equals(n.key, '')
+        assert.equals(array.length(n.children), 0)
+    end
 end
 
 test leaf
-it 'builds a childless ViewNode'
-  let n = leaf('Label', set({}, 'text', 'x'))
-  assert.equals(n.kind, 'Label')
-  assert.equals(array.length(n.children), 0)
-  assert.equals(getString(n.props, 'text')!, 'x')
-end
+    it 'builds a childless ViewNode'
+        let n = leaf('Label', set({}, 'text', 'x'))
+        assert.equals(n.kind, 'Label')
+        assert.equals(array.length(n.children), 0)
+        assert.equals(getString(n.props, 'text')!, 'x')
+    end
 end
 
 test propOr
-it 'returns the stored string when the key exists'
-  let p = set({}, 'text', 'hi')
-  assert.equals(propOr(p, 'text', 'fallback'), 'hi')
-end
-it 'returns the fallback when the key is missing'
-  assert.equals(propOr({}, 'text', 'fallback'), 'fallback')
-end
+    it 'returns the stored string when the key exists'
+        let p = set({}, 'text', 'hi')
+        assert.equals(propOr(p, 'text', 'fallback'), 'hi')
+    end
+    it 'returns the fallback when the key is missing'
+        assert.equals(propOr({}, 'text', 'fallback'), 'fallback')
+    end
 end
 
 test propsToStyle
-it 'produces empty style for empty props'
-  assert.equals(propsToStyle({}), '')
-end
-it 'emits padding as px'
-  assert.equals(propsToStyle(set({}, 'padding', 12)), 'padding:12px;')
-end
-it 'emits background and foreground colour'
-  let p = set(set({}, 'background', '#000'), 'foreground', '#fff')
-  let style = propsToStyle(p)
-  assert.equals(string.contains(style, 'background:#000;'), true)
-  assert.equals(string.contains(style, 'color:#fff;'), true)
-end
+    it 'produces empty style for empty props'
+        assert.equals(propsToStyle({}), '')
+    end
+    it 'emits padding as px'
+        assert.equals(propsToStyle(set({}, 'padding', 12)), 'padding:12px;')
+    end
+    it 'emits per-side padding as px'
+        let p = set(set(set(set({}, 'paddingTop', 1), 'paddingRight', 2), 'paddingBottom', 3), 'paddingLeft', 4)
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'padding-top:1px;'), true)
+        assert.equals(string.contains(style, 'padding-right:2px;'), true)
+        assert.equals(string.contains(style, 'padding-bottom:3px;'), true)
+        assert.equals(string.contains(style, 'padding-left:4px;'), true)
+    end
+    it 'emits margin as px'
+        assert.equals(propsToStyle(set({}, 'margin', 16)), 'margin:16px;')
+    end
+    it 'emits per-side margin as px'
+        let p = set(set(set(set({}, 'marginTop', 1), 'marginRight', 2), 'marginBottom', 3), 'marginLeft', 4)
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'margin-top:1px;'), true)
+        assert.equals(string.contains(style, 'margin-right:2px;'), true)
+        assert.equals(string.contains(style, 'margin-bottom:3px;'), true)
+        assert.equals(string.contains(style, 'margin-left:4px;'), true)
+    end
+    it 'emits background and foreground colour'
+        let p = set(set({}, 'background', '#000'), 'foreground', '#fff')
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'background:#000;'), true)
+        assert.equals(string.contains(style, 'color:#fff;'), true)
+    end
+    it 'emits border as a solid CSS shorthand'
+        let p = set(set({}, 'borderWidth', 2), 'borderColor', '#e0e6ec')
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'border:2px solid #e0e6ec;'), true)
+    end
 end
 
 test childPath
-it 'is the index at the root'
-  assert.equals(childPath('', 2), '2')
-end
-it 'dots the index onto a non-root parent'
-  assert.equals(childPath('1', 3), '1.3')
-end
+    it 'is the index at the root'
+        assert.equals(childPath('', 2), '2')
+    end
+    it 'dots the index onto a non-root parent'
+        assert.equals(childPath('1', 3), '1.3')
+    end
 end
 
 test keyAttr
-it 'is empty for a keyless node'
-  assert.equals(keyAttr(leaf('Label', {})), '')
-end
-it 'carries the data-fai-key when the node has a key'
-  let n = ViewNode(kind: 'Label', key: 'row-7', props: {}, children: [], events: emptyEvents())
-  assert.equals(keyAttr(n), ' data-fai-key="row-7"')
-end
+    it 'is empty for a keyless node'
+        assert.equals(keyAttr(leaf('Label', {})), '')
+    end
+    it 'carries the data-fai-key when the node has a key'
+        let n = ViewNode(kind: 'Label', key: 'row-7', props: {}, children: [], events: emptyEvents())
+        assert.equals(keyAttr(n), ' data-fai-key="row-7"')
+    end
 end
 
 test pathAttr
-it 'is empty when includePath is false'
-  assert.equals(pathAttr('0.1', false), '')
-end
-it 'emits data-fai-path when includePath is true'
-  assert.equals(pathAttr('0.1', true), ' data-fai-path="0.1"')
-end
+    it 'is empty when includePath is false'
+        assert.equals(pathAttr('0.1', false), '')
+    end
+    it 'emits data-fai-path when includePath is true'
+        assert.equals(pathAttr('0.1', true), ' data-fai-path="0.1"')
+    end
 end
 
 test nodeAttrs
-it 'combines key and path attributes'
-  let n = ViewNode(kind: 'Label', key: 'k', props: {}, children: [], events: emptyEvents())
-  assert.equals(nodeAttrs(n, '1', true), ' data-fai-key="k" data-fai-path="1"')
-end
-it 'is the empty string for a keyless node with includePath off'
-  assert.equals(nodeAttrs(leaf('Label', {}), '1', false), '')
-end
+    it 'combines key and path attributes'
+        let n = ViewNode(kind: 'Label', key: 'k', props: {}, children: [], events: emptyEvents())
+        assert.equals(nodeAttrs(n, '1', true), ' data-fai-key="k" data-fai-path="1"')
+    end
+    it 'is the empty string for a keyless node with includePath off'
+        assert.equals(nodeAttrs(leaf('Label', {}), '1', false), '')
+    end
 end
 
 test renderDivWithClass
-it 'emits the class on a <div> wrapper'
-  let n = testNode('View', {}, [])
-  let html = renderDivWithClass(n, '', false, 'fai-view')
-  assert.equals(html, '<div class="fai-view"></div>')
-end
-it 'folds modifier styles into inline style'
-  let n = testNode('View', set({}, 'padding', 8), [])
-  let html = renderDivWithClass(n, '', false, 'fai-view')
-  assert.equals(string.contains(html, 'style="padding:8px;"'), true)
-end
+    it 'emits the class on a <div> wrapper'
+        let n = testNode('View', {}, [])
+        let html = renderDivWithClass(n, '', false, 'fai-view')
+        assert.equals(html, '<div class="fai-view"></div>')
+    end
+    it 'folds modifier styles into inline style'
+        let n = testNode('View', set({}, 'padding', 8), [])
+        let html = renderDivWithClass(n, '', false, 'fai-view')
+        assert.equals(string.contains(html, 'style="padding:8px;"'), true)
+    end
 end
 
 test renderSpacer
-it 'emits an empty spacer div'
-  assert.equals(renderSpacer(leaf('Spacer', {}), '', false), '<div class="fai-spacer"></div>')
-end
+    it 'emits an empty spacer div'
+        assert.equals(renderSpacer(leaf('Spacer', {}), '', false), '<div class="fai-spacer"></div>')
+    end
 end
 
 test renderButton
-it 'emits a <button> carrying the text'
-  let n = leaf('Button', set({}, 'text', 'Save'))
-  assert.equals(renderButton(n, '', false), '<button class="fai-button">Save</button>')
-end
-it 'wires onclick when the node has a handlerId'
-  let n = leaf('Button', set(set({}, 'text', 'Go'), 'handlerId', 3))
-  assert.equals(string.contains(renderButton(n, '', false), 'onclick="handleEvent(3)"'), true)
-end
+    it 'emits a <button> carrying the text'
+        let n = leaf('Button', set({}, 'text', 'Save'))
+        assert.equals(renderButton(n, '', false), '<button class="fai-button">Save</button>')
+    end
+    it 'wires onclick when the node has a handlerId'
+        let n = leaf('Button', set(set({}, 'text', 'Go'), 'handlerId', 3))
+        assert.equals(string.contains(renderButton(n, '', false), 'onclick="handleEvent(3)"'), true)
+    end
 end
 
 test renderTextInput
-it 'emits an <input> with placeholder and value'
-  let p = set(set({}, 'placeholder', 'Search'), 'value', 'foo')
-  let n = leaf('TextInput', p)
-  let html = renderTextInput(n, '', false)
-  assert.equals(string.contains(html, 'placeholder="Search"'), true)
-  assert.equals(string.contains(html, 'value="foo"'), true)
-end
-it 'defaults the input type to text'
-  let n = leaf('TextInput', {})
-  assert.equals(string.startsWith(renderTextInput(n, '', false), '<input type="text"'), true)
-end
+    it 'emits an <input> with placeholder and value'
+        let p = set(set({}, 'placeholder', 'Search'), 'value', 'foo')
+        let n = leaf('TextInput', p)
+        let html = renderTextInput(n, '', false)
+        assert.equals(string.contains(html, 'placeholder="Search"'), true)
+        assert.equals(string.contains(html, 'value="foo"'), true)
+    end
+    it 'defaults the input type to text'
+        let n = leaf('TextInput', {})
+        assert.equals(string.startsWith(renderTextInput(n, '', false), '<input type="text"'), true)
+    end
 end
 
 test renderImage
-it 'emits an <img> with src'
-  let n = leaf('ImageView', set({}, 'src', '/logo.png'))
-  assert.equals(renderImage(n, '', false), '<img class="fai-image" src="/logo.png"/>')
-end
+    it 'emits an <img> with src'
+        let n = leaf('ImageView', set({}, 'src', '/logo.png'))
+        assert.equals(renderImage(n, '', false), '<img class="fai-image" src="/logo.png"/>')
+    end
 end
 
 test renderToggle
-it 'emits a <button> carrying aria + data-on'
-  let n = leaf('Toggle', set({}, 'on', 'true'))
-  let html = renderToggle(n, '', false)
-  assert.equals(string.contains(html, 'aria-checked="true"'), true)
-  assert.equals(string.contains(html, 'data-on="true"'), true)
-end
+    it 'emits a <button> carrying aria + data-on'
+        let n = leaf('Toggle', set({}, 'on', 'true'))
+        let html = renderToggle(n, '', false)
+        assert.equals(string.contains(html, 'aria-checked="true"'), true)
+        assert.equals(string.contains(html, 'data-on="true"'), true)
+    end
 end
 
 test renderDivider
-it 'emits an <hr>'
-  assert.equals(renderDivider(leaf('Divider', {}), '', false), '<hr class="fai-divider"/>')
-end
+    it 'emits an <hr>'
+        assert.equals(renderDivider(leaf('Divider', {}), '', false), '<hr class="fai-divider"/>')
+    end
 end
 
 test renderSegment
-it 'emits a segment <button> with selected + text'
-  let p = set(set({}, 'text', 'Day'), 'selected', 'true')
-  let html = renderSegment(leaf('Segment', p), '', false)
-  assert.equals(string.contains(html, 'data-selected="true"'), true)
-  assert.equals(string.contains(html, '>Day</button>'), true)
-end
+    it 'emits a segment <button> with selected + text'
+        let p = set(set({}, 'text', 'Day'), 'selected', 'true')
+        let html = renderSegment(leaf('Segment', p), '', false)
+        assert.equals(string.contains(html, 'data-selected="true"'), true)
+        assert.equals(string.contains(html, '>Day</button>'), true)
+    end
 end
 
 test renderSegmented
-it 'wraps children segments inside a tablist div'
-  let children = [
-    leaf('Segment', set({}, 'text', 'A'))
-    leaf('Segment', set({}, 'text', 'B'))
-  ]
-  let html = renderSegmented(testNode('SegmentedControl', {}, children), '', false)
-  assert.equals(string.contains(html, 'role="tablist"'), true)
-  assert.equals(string.contains(html, '>A</button>'), true)
-  assert.equals(string.contains(html, '>B</button>'), true)
-end
+    it 'wraps children segments inside a tablist div'
+        let children = [
+            leaf('Segment', set({}, 'text', 'A'))
+            leaf('Segment', set({}, 'text', 'B'))
+        ]
+        let html = renderSegmented(testNode('SegmentedControl', {}, children), '', false)
+        assert.equals(string.contains(html, 'role="tablist"'), true)
+        assert.equals(string.contains(html, '>A</button>'), true)
+        assert.equals(string.contains(html, '>B</button>'), true)
+    end
 end
 
 test renderChildren
-it 'concatenates child HTML without path attrs'
-  let parent = testNode('VStack', {}, [
-    leaf('Label', set({}, 'text', 'a'))
-    leaf('Label', set({}, 'text', 'b'))
-  ])
-  let html = renderChildren(parent)
-  assert.equals(html, '<span class="fai-label">a</span><span class="fai-label">b</span>')
-end
+    it 'concatenates child HTML without path attrs'
+        let parent = testNode('VStack', {}, [
+            leaf('Label', set({}, 'text', 'a'))
+            leaf('Label', set({}, 'text', 'b'))
+        ])
+        let html = renderChildren(parent)
+        assert.equals(html, '<span class="fai-label">a</span><span class="fai-label">b</span>')
+    end
 end
 
 test renderChildrenInternal
-it 'dots child indices onto the parent path when includePath is on'
-  let parent = testNode('VStack', {}, [
-    leaf('Label', set({}, 'text', 'a'))
-  ])
-  let html = renderChildrenInternal(parent, '5', true)
-  assert.equals(string.contains(html, 'data-fai-path="5.0"'), true)
-end
+    it 'dots child indices onto the parent path when includePath is on'
+        let parent = testNode('VStack', {}, [
+            leaf('Label', set({}, 'text', 'a'))
+        ])
+        let html = renderChildrenInternal(parent, '5', true)
+        assert.equals(string.contains(html, 'data-fai-path="5.0"'), true)
+    end
 end
 
 test renderNodeHtml
-it 'routes a Label node to renderLabel'
-  let n = leaf('Label', set({}, 'text', 'x'))
-  assert.equals(renderNodeHtml(n, '', false), '<span class="fai-label">x</span>')
-end
-it 'wraps an unknown kind in a generic fai-view div'
-  let n = testNode('Mystery', {}, [])
-  assert.equals(renderNodeHtml(n, '', false), '<div class="fai-view"></div>')
-end
+    it 'routes a Label node to renderLabel'
+        let n = leaf('Label', set({}, 'text', 'x'))
+        assert.equals(renderNodeHtml(n, '', false), '<span class="fai-label">x</span>')
+    end
+    it 'wraps an unknown kind in a generic fai-view div'
+        let n = testNode('Mystery', {}, [])
+        assert.equals(renderNodeHtml(n, '', false), '<div class="fai-view"></div>')
+    end
 end
