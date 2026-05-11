@@ -56,46 +56,54 @@ do
                         if kind == 'Label'
                             renderLabel(node, path, includePath)
                         else
-                            if kind == 'Button'
-                                renderButton(node, path, includePath)
+                            if kind == 'Paragraph'
+                                renderParagraph(node, path, includePath)
                             else
-                                if kind == 'Spacer'
-                                    renderSpacer(node, path, includePath)
+                                if kind == 'Heading'
+                                    renderHeading(node, path, includePath)
                                 else
-                                    if kind == 'TextInput'
-                                        renderTextInput(node, path, includePath)
+                                    if kind == 'Button'
+                                        renderButton(node, path, includePath)
                                     else
-                                        if kind == 'ScrollView'
-                                            renderDivWithClass(node, path, includePath, 'fai-scrollview')
+                                        if kind == 'Spacer'
+                                            renderSpacer(node, path, includePath)
                                         else
-                                            if kind == 'Image'
-                                                renderImage(node, path, includePath)
+                                            if kind == 'TextInput'
+                                                renderTextInput(node, path, includePath)
                                             else
-                                                if kind == 'Toggle'
-                                                    renderToggle(node, path, includePath)
+                                                if kind == 'ScrollView'
+                                                    renderDivWithClass(node, path, includePath, 'fai-scrollview')
                                                 else
-                                                    if kind == 'Divider'
-                                                        renderDivider(node, path, includePath)
+                                                    if kind == 'Image'
+                                                        renderImage(node, path, includePath)
                                                     else
-                                                        if kind == 'SegmentedControl'
-                                                            renderSegmented(node, path, includePath)
+                                                        if kind == 'Toggle'
+                                                            renderToggle(node, path, includePath)
                                                         else
-                                                            if kind == 'Router'
-                                                                renderRouter(node, path, includePath)
+                                                            if kind == 'Divider'
+                                                                renderDivider(node, path, includePath)
                                                             else
-                                                                if kind == 'Link'
-                                                                    renderLink(node, path, includePath)
+                                                                if kind == 'SegmentedControl'
+                                                                    renderSegmented(node, path, includePath)
                                                                 else
-                                                                    if kind == 'Pre'
-                                                                        renderPre(node, path, includePath)
+                                                                    if kind == 'Router'
+                                                                        renderRouter(node, path, includePath)
                                                                     else
-                                                                        if kind == 'Code'
-                                                                            renderCode(node, path, includePath)
+                                                                        if kind == 'Link'
+                                                                            renderLink(node, path, includePath)
                                                                         else
-                                                                            if kind == 'Span'
-                                                                                renderSpan(node, path, includePath)
+                                                                            if kind == 'Pre'
+                                                                                renderPre(node, path, includePath)
                                                                             else
-                                                                                renderDivWithClass(node, path, includePath, 'fai-view')
+                                                                                if kind == 'Code'
+                                                                                    renderCode(node, path, includePath)
+                                                                                else
+                                                                                    if kind == 'Span'
+                                                                                        renderSpan(node, path, includePath)
+                                                                                    else
+                                                                                        renderDivWithClass(node, path, includePath, 'fai-view')
+                                                                                    end
+                                                                                end
                                                                             end
                                                                         end
                                                                     end
@@ -272,6 +280,73 @@ do
         out = out + ' style="' + style + '"'
     end
     out + '>' + text + '</span>'
+end
+
+# Render a Paragraph as semantic block prose.
+def renderParagraph
+    @param node ViewNode
+    @param path String
+    @param includePath Bool
+    @return String
+do
+    let text = propOr(node.props, 'text', '')
+    let style = propsToStyle(node.props)
+    let attrs = nodeAttrs(node, path, includePath)
+    var out = '<p' + attrs + classAttr(node, 'fai-paragraph')
+    if style != ''
+        out = out + ' style="' + style + '"'
+    end
+    out + '>' + text + '</p>'
+end
+
+# Render a Heading as h1-h6. Invalid or missing levels fall back to h3.
+def renderHeading
+    @param node ViewNode
+    @param path String
+    @param includePath Bool
+    @return String
+do
+    let text = propOr(node.props, 'text', '')
+    let style = propsToStyle(node.props)
+    let attrs = nodeAttrs(node, path, includePath)
+    let tag = headingTag(node)
+    var out = '<' + tag + attrs + classAttr(node, 'fai-heading')
+    if style != ''
+        out = out + ' style="' + style + '"'
+    end
+    out + '>' + text + '</' + tag + '>'
+end
+
+# Return the HTML tag for a Heading node.
+def headingTag
+    @param node ViewNode
+    @return String
+do
+    var level = 3
+    if hasKey(node.props, 'level')
+        level = unwrap(getInt(node.props, 'level'), 3)
+    end
+    if level == 1
+        'h1'
+    else
+        if level == 2
+            'h2'
+        else
+            if level == 4
+                'h4'
+            else
+                if level == 5
+                    'h5'
+                else
+                    if level == 6
+                        'h6'
+                    else
+                        'h3'
+                    end
+                end
+            end
+        end
+    end
 end
 
 # Render a Span leaf. Counterpart to renderLabel — same shape, but a
@@ -549,6 +624,9 @@ do
     if hasKey(props, 'marginLeft')
         style = style + 'margin-left:' + toString(getInt(props, 'marginLeft')) + 'px;'
     end
+    if hasKey(props, 'centered')
+        style = style + 'margin-left:auto;margin-right:auto;'
+    end
     if hasKey(props, 'background')
         let bg = getString(props, 'background')
         style = style + 'background:' + unwrap(bg, '') + ';'
@@ -564,12 +642,36 @@ do
         let bc = getString(props, 'borderColor')
         style = style + 'border:' + toString(getInt(props, 'borderWidth')) + 'px solid ' + unwrap(bc, 'currentColor') + ';'
     end
+    if hasKey(props, 'borderLeftWidth')
+        let blc = getString(props, 'borderLeftColor')
+        style = style + 'border-left:' + toString(getInt(props, 'borderLeftWidth')) + 'px solid ' + unwrap(blc, 'currentColor') + ';'
+    end
     if hasKey(props, 'fontSize')
         style = style + 'font-size:' + toString(getInt(props, 'fontSize')) + 'px;'
     end
     if hasKey(props, 'fontWeight')
         let fw = getString(props, 'fontWeight')
         style = style + 'font-weight:' + unwrap(fw, '') + ';'
+    end
+    if hasKey(props, 'lineHeight')
+        let lh = getString(props, 'lineHeight')
+        style = style + 'line-height:' + unwrap(lh, '') + ';'
+    end
+    if hasKey(props, 'fontStyle')
+        let fs = getString(props, 'fontStyle')
+        style = style + 'font-style:' + unwrap(fs, '') + ';'
+    end
+    if hasKey(props, 'letterSpacing')
+        let ls = getString(props, 'letterSpacing')
+        style = style + 'letter-spacing:' + unwrap(ls, '') + ';'
+    end
+    if hasKey(props, 'textAlign')
+        let ta = getString(props, 'textAlign')
+        style = style + 'text-align:' + unwrap(ta, '') + ';'
+    end
+    if hasKey(props, 'fontFamily')
+        let ff = getString(props, 'fontFamily')
+        style = style + 'font-family:' + unwrap(ff, '') + ';'
     end
     if hasKey(props, 'opacity')
         style = style + 'opacity:' + toString(getInt(props, 'opacity')) + ';'
@@ -578,13 +680,58 @@ do
         let fl = getString(props, 'flex')
         style = style + 'flex:' + unwrap(fl, '') + ';'
     end
+    if hasKey(props, 'alignItems')
+        let ai = getString(props, 'alignItems')
+        style = style + 'align-items:' + unwrap(ai, '') + ';'
+    end
+    if hasKey(props, 'justifyContent')
+        let jc = getString(props, 'justifyContent')
+        style = style + 'justify-content:' + unwrap(jc, '') + ';'
+    end
+    if hasKey(props, 'flexWrap')
+        let fw = getString(props, 'flexWrap')
+        style = style + 'flex-wrap:' + unwrap(fw, '') + ';'
+    end
+    if hasKey(props, 'gap')
+        style = style + 'gap:' + toString(getInt(props, 'gap')) + 'px;'
+    end
+    if hasKey(props, 'alignSelf')
+        let asv = getString(props, 'alignSelf')
+        style = style + 'align-self:' + unwrap(asv, '') + ';'
+    end
+    if hasKey(props, 'display')
+        let d = getString(props, 'display')
+        style = style + 'display:' + unwrap(d, '') + ';'
+    end
     if hasKey(props, 'width')
         let w = getString(props, 'width')
         style = style + 'width:' + unwrap(w, '') + ';'
     end
+    if hasKey(props, 'minWidth')
+        let mw = getString(props, 'minWidth')
+        style = style + 'min-width:' + unwrap(mw, '') + ';'
+    end
+    if hasKey(props, 'height')
+        let h = getString(props, 'height')
+        style = style + 'height:' + unwrap(h, '') + ';'
+    end
+    if hasKey(props, 'minHeight')
+        let mh = getString(props, 'minHeight')
+        style = style + 'min-height:' + unwrap(mh, '') + ';'
+    end
     if hasKey(props, 'maxWidth')
         let mw = getString(props, 'maxWidth')
         style = style + 'max-width:' + unwrap(mw, '') + ';'
+    end
+    if hasKey(props, 'position')
+        let pos = getString(props, 'position')
+        style = style + 'position:' + unwrap(pos, '') + ';'
+    end
+    if hasKey(props, 'top')
+        style = style + 'top:' + toString(getInt(props, 'top')) + 'px;'
+    end
+    if hasKey(props, 'zIndex')
+        style = style + 'z-index:' + toString(getInt(props, 'zIndex')) + ';'
     end
     style
 end
@@ -631,6 +778,57 @@ test renderLabel
         let node = leaf('Label', props)
         let html = renderToHtml(node)
         assert.equals(html, '<span class="fai-label" style="font-size:24px;">styled</span>')
+    end
+end
+
+test renderParagraph
+    it 'renders a paragraph as a class-bearing p'
+        let node = leaf('Paragraph', set({}, 'text', 'body'))
+        let html = renderToHtml(node)
+        assert.equals(html, '<p class="fai-paragraph">body</p>')
+    end
+    it 'preserves cssClass and modifiers'
+        let props = set(set(set({}, 'text', 'body'), 'cssClass', 'intro'), 'lineHeight', '1.65')
+        let node = leaf('Paragraph', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<p class="fai-paragraph intro" style="line-height:1.65;">body</p>')
+    end
+end
+
+test renderHeading
+    it 'renders a heading as h3 by default'
+        let node = leaf('Heading', set({}, 'text', 'Section'))
+        let html = renderToHtml(node)
+        assert.equals(html, '<h3 class="fai-heading">Section</h3>')
+    end
+    it 'renders an explicit heading level'
+        let props = set(set({}, 'text', 'Page'), 'level', 1)
+        let node = leaf('Heading', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<h1 class="fai-heading">Page</h1>')
+    end
+    it 'falls back to h3 for invalid heading levels'
+        let props = set(set({}, 'text', 'Bad'), 'level', 9)
+        let node = leaf('Heading', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<h3 class="fai-heading">Bad</h3>')
+    end
+    it 'preserves cssClass and modifiers'
+        let props = set(set(set({}, 'text', 'Section'), 'cssClass', 'hero-title'), 'fontSize', 42)
+        let node = leaf('Heading', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<h3 class="fai-heading hero-title" style="font-size:42px;">Section</h3>')
+    end
+end
+
+test headingTag
+    it 'maps heading levels to tags'
+        let h1 = leaf('Heading', set(set({}, 'text', 'Page'), 'level', 1))
+        let h3 = leaf('Heading', set({}, 'text', 'Default'))
+        let bad = leaf('Heading', set(set({}, 'text', 'Bad'), 'level', 9))
+        assert.equals(headingTag(h1), 'h1')
+        assert.equals(headingTag(h3), 'h3')
+        assert.equals(headingTag(bad), 'h3')
     end
 end
 
@@ -884,6 +1082,60 @@ test propsToStyle
         let style = propsToStyle(p)
         assert.equals(string.contains(style, 'border:2px solid #e0e6ec;'), true)
     end
+    it 'emits left border as a solid CSS shorthand'
+        let p = set(set({}, 'borderLeftWidth', 2), 'borderLeftColor', '#dde5dc')
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'border-left:2px solid #dde5dc;'), true)
+    end
+    it 'emits flex alignment styles'
+        var p = set({}, 'alignItems', 'stretch')
+        p = set(p, 'justifyContent', 'flex-end')
+        p = set(p, 'flexWrap', 'wrap')
+        p = set(p, 'gap', 24)
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'align-items:stretch;'), true)
+        assert.equals(string.contains(style, 'justify-content:flex-end;'), true)
+        assert.equals(string.contains(style, 'flex-wrap:wrap;'), true)
+        assert.equals(string.contains(style, 'gap:24px;'), true)
+    end
+    it 'emits child and sizing styles'
+        var p = set({}, 'alignSelf', 'stretch')
+        p = set(p, 'display', 'block')
+        p = set(p, 'minWidth', '240px')
+        p = set(p, 'height', '100%')
+        p = set(p, 'minHeight', '100vh')
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'align-self:stretch;'), true)
+        assert.equals(string.contains(style, 'display:block;'), true)
+        assert.equals(string.contains(style, 'min-width:240px;'), true)
+        assert.equals(string.contains(style, 'height:100%;'), true)
+        assert.equals(string.contains(style, 'min-height:100vh;'), true)
+    end
+    it 'emits typography helper styles'
+        var p = set({}, 'lineHeight', '1.65')
+        p = set(p, 'fontStyle', 'italic')
+        p = set(p, 'letterSpacing', '0.02em')
+        p = set(p, 'textAlign', 'left')
+        p = set(p, 'fontFamily', 'Inter, sans-serif')
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'line-height:1.65;'), true)
+        assert.equals(string.contains(style, 'font-style:italic;'), true)
+        assert.equals(string.contains(style, 'letter-spacing:0.02em;'), true)
+        assert.equals(string.contains(style, 'text-align:left;'), true)
+        assert.equals(string.contains(style, 'font-family:Inter, sans-serif;'), true)
+    end
+    it 'emits positioning and centered styles'
+        var p = set({}, 'position', 'sticky')
+        p = set(p, 'top', 0)
+        p = set(p, 'zIndex', 20)
+        p = set(p, 'centered', 'true')
+        let style = propsToStyle(p)
+        assert.equals(string.contains(style, 'position:sticky;'), true)
+        assert.equals(string.contains(style, 'top:0px;'), true)
+        assert.equals(string.contains(style, 'z-index:20;'), true)
+        assert.equals(string.contains(style, 'margin-left:auto;'), true)
+        assert.equals(string.contains(style, 'margin-right:auto;'), true)
+    end
 end
 
 test childPath
@@ -1030,6 +1282,12 @@ test classAttr
 end
 
 test renderNodeHtml
+    it 'dispatches Paragraph and Heading through renderNodeHtml'
+        let para = leaf('Paragraph', set({}, 'text', 'copy'))
+        let head = leaf('Heading', set(set({}, 'text', 'Title'), 'level', 2))
+        assert.equals(renderNodeHtml(para, '', false), '<p class="fai-paragraph">copy</p>')
+        assert.equals(renderNodeHtml(head, '', false), '<h2 class="fai-heading">Title</h2>')
+    end
     it 'dispatches Pre + Code through renderNodeHtml end-to-end'
         let span = leaf('Span', set({}, 'text', 'curl -fsSL ...'))
         let code = testNode('Code', {}, [span])
