@@ -69,9 +69,10 @@ do
     end
 end
 
-# Server-side entry point. Renders `app` at `path` synchronously
-# (signal loaders execute during render, not via nowait) and returns
-# a plain HTML string. Inject into <div id="app"> of the page shell.
+# Server-side entry point. Renders `app` at `path` and returns a plain HTML
+# string. Loader-backed signals render in their loading state during SSR and
+# load on the browser client. Inject the returned markup into the page shell's
+# <div id="app">.
 def renderToString
     @param app RenderFn
     @param path String

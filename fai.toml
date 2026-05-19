@@ -2,6 +2,7 @@
 name = "HtmlForui"
 version = "0.1.0"
 source_root = "src"
+docs = "docs.md"
 
 [dependencies]
 Forui = "https://github.com/forailang/forui"
