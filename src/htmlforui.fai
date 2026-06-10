@@ -90,20 +90,66 @@ def patchPathForOps
     @param ops DiffOp[]
     @return String
 do
-    if array.length(ops) != 1
+    let count = array.length(ops)
+    if count == 0
         ''
     else
-        let op = ops[0]
-        if op.action == 'insert'
-            parentPath(op.path)
-        else
-            if op.action == 'remove'
-                parentPath(op.path)
+        var common = ''
+        var first = true
+        for op in ops
+            var p = op.path
+            if op.action == 'insert'
+                p = parentPath(op.path)
             else
-                op.path
+                if op.action == 'remove'
+                    p = parentPath(op.path)
+                end
+            end
+            if first
+                common = p
+                first = false
+            else
+                common = commonPrefixPath(common, p)
             end
         end
+        common
     end
+end
+
+# Longest shared dot-path prefix of two paths, compared segment by
+# segment. `'0.1.0'` & `'0.1.5'` → `'0.1'`; `'0'` & `'1'` → `''` (root).
+# Lets the adapter patch the smallest subtree that contains every op in
+# a multi-op diff instead of re-rendering the whole document.
+def commonPrefixPath
+    @param a String
+    @param b String
+    @return String
+do
+    let pa = string.split(a, '.')
+    let pb = string.split(b, '.')
+    let na = array.length(pa)
+    let nb = array.length(pb)
+    var limit = na
+    if nb < na
+        limit = nb
+    end
+    var result = ''
+    var i = 0
+    var stop = false
+    while i < limit
+        if !stop
+            if pa[i] == pb[i]
+                if i > 0
+                    result = result + '.'
+                end
+                result = result + pa[i]
+            else
+                stop = true
+            end
+        end
+        i = i + 1
+    end
+    result
 end
 
 # Drop the last dot-segment from a path — `'1.2.3'` → `'1.2'`. Empty
@@ -206,12 +252,31 @@ test patchPathForOps
         ]
         assert.equals(patchPathForOps(ops), '2')
     end
-    it 'falls back to root for multi-op diffs'
+    it 'falls back to root when multi-op diffs share no ancestor'
         let ops = [
             DiffOp(action: 'update', path: '0', node: null, props: {})
             DiffOp(action: 'update', path: '1', node: null, props: {})
         ]
         assert.equals(patchPathForOps(ops), '')
+    end
+    it 'targets the common ancestor when multi-op diffs share one'
+        let ops = [
+            DiffOp(action: 'update', path: '0.1.0', node: null, props: {})
+            DiffOp(action: 'update', path: '0.1.3', node: null, props: {})
+        ]
+        assert.equals(patchPathForOps(ops), '0.1')
+    end
+end
+
+test commonPrefixPath
+    it 'returns the shared prefix for divergent nested paths'
+        assert.equals(commonPrefixPath('0.1.0', '0.1.5'), '0.1')
+    end
+    it 'returns root when paths diverge at the top segment'
+        assert.equals(commonPrefixPath('0', '1'), '')
+    end
+    it 'returns the shorter path when it is a prefix of the longer'
+        assert.equals(commonPrefixPath('0.1', '0.1.4'), '0.1')
     end
 end
 
