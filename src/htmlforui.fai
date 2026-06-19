@@ -1,5 +1,7 @@
 use std.array
 
+use std.convert
+
 use std.string
 
 use { renderPatchHtml, renderToHtml } from html
@@ -30,16 +32,16 @@ end
 # ── Web Router Integration ──────────────────────────────────────────
 # To wire the forui router to the browser History API, the WASM
 # runtime needs these platform functions:
-# 
+#
 #   getLocationPath() -> String     reads window.location.pathname
 #   pushHistoryState(path: String)  calls history.pushState
 #   historyBack()                   calls history.back()
-# 
+#
 # Once available, initWebRouter() should:
 #   1. setPathFromPlatform(getLocationPath())
 #   2. onNavigate(do with path String  pushHistoryState(path) end)
 #   3. onBack(do  historyBack() end)
-# 
+#
 # The hosting page also needs a popstate listener in JS:
 #   window.addEventListener('popstate', function() {
 #     wasmModule.setPathFromPlatform(window.location.pathname);
@@ -186,22 +188,32 @@ def findNodeAtPath
     @param currentPath String
     @return ViewNode?
 do
-    if currentPath == targetPath
+    if targetPath == currentPath
         node
     else
-        var found ViewNode? = null
-        var i = 0
-        let childCount = array.length(node.children)
-        while i < childCount
-            let childPath = childPathFor(currentPath, i)
-            let maybeFound = findNodeAtPath(node.children[i], targetPath, childPath)
-            if maybeFound?
-                found = maybeFound
-                break
-            end
-            i = i + 1
+        let parts = string.split(targetPath, '.')
+        findNodeAtSegments(node, parts, 0)
+    end
+end
+
+# Walk directly down a dot-path split into numeric segments.
+def findNodeAtSegments
+    @param node ViewNode
+    @param parts String[]
+    @param index Int
+    @return ViewNode?
+do
+    if index >= array.length(parts)
+        node
+    else
+        let childIndex = unwrap(convert.parseInt(parts[index]), -1)
+        if childIndex < 0
+            null
+        else if childIndex >= array.length(node.children)
+            null
+        else
+            findNodeAtSegments(node.children[childIndex], parts, index + 1)
         end
-        found
     end
 end
 
@@ -295,6 +307,27 @@ test findNodeAtPath
     it 'returns null for a missing path'
         let tree = testNode('VStack', [])
         let found = findNodeAtPath(tree, '0', '')
+        assert.isFalse(found?)
+    end
+end
+
+test findNodeAtSegments
+    it 'walks numeric path segments directly'
+        let tree = testNode('VStack', [
+            testNode('Label', [])
+            testNode('HStack', [
+                testNode('Button', [])
+            ])
+        ])
+        let found = findNodeAtSegments(tree, ['1' '0'], 0)
+        assert.isTrue(found?)
+        assert.equals(found!.kind, 'Button')
+    end
+    it 'returns null for non-numeric path segments'
+        let tree = testNode('VStack', [
+            testNode('Label', [])
+        ])
+        let found = findNodeAtSegments(tree, ['x'], 0)
         assert.isFalse(found?)
     end
 end
