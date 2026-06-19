@@ -26,7 +26,7 @@ do
 end
 
 # Internal renderer used by both plain HTML output and patch-aware output.
-# 
+#
 # Each component kind emits a `class="fai-<kind>"` attribute; base
 # styles live in `forui.css` (shipped by `forai build --html`). User
 # modifier styles (padding/background/...) still render inline so they
@@ -71,37 +71,41 @@ do
                                             if kind == 'TextInput'
                                                 renderTextInput(node, path, includePath)
                                             else
-                                                if kind == 'ScrollView'
-                                                    renderDivWithClass(node, path, includePath, 'fai-scrollview')
+                                                if kind == 'TextArea'
+                                                    renderTextArea(node, path, includePath)
                                                 else
-                                                    if kind == 'Image'
-                                                        renderImage(node, path, includePath)
+                                                    if kind == 'ScrollView'
+                                                        renderDivWithClass(node, path, includePath, 'fai-scrollview')
                                                     else
-                                                        if kind == 'Toggle'
-                                                            renderToggle(node, path, includePath)
+                                                        if kind == 'Image'
+                                                            renderImage(node, path, includePath)
                                                         else
-                                                            if kind == 'Divider'
-                                                                renderDivider(node, path, includePath)
+                                                            if kind == 'Toggle'
+                                                                renderToggle(node, path, includePath)
                                                             else
-                                                                if kind == 'SegmentedControl'
-                                                                    renderSegmented(node, path, includePath)
+                                                                if kind == 'Divider'
+                                                                    renderDivider(node, path, includePath)
                                                                 else
-                                                                    if kind == 'Router'
-                                                                        renderRouter(node, path, includePath)
+                                                                    if kind == 'SegmentedControl'
+                                                                        renderSegmented(node, path, includePath)
                                                                     else
-                                                                        if kind == 'Link'
-                                                                            renderLink(node, path, includePath)
+                                                                        if kind == 'Router'
+                                                                            renderRouter(node, path, includePath)
                                                                         else
-                                                                            if kind == 'Pre'
-                                                                                renderPre(node, path, includePath)
+                                                                            if kind == 'Link'
+                                                                                renderLink(node, path, includePath)
                                                                             else
-                                                                                if kind == 'Code'
-                                                                                    renderCode(node, path, includePath)
+                                                                                if kind == 'Pre'
+                                                                                    renderPre(node, path, includePath)
                                                                                 else
-                                                                                    if kind == 'Span'
-                                                                                        renderSpan(node, path, includePath)
+                                                                                    if kind == 'Code'
+                                                                                        renderCode(node, path, includePath)
                                                                                     else
-                                                                                        renderDivWithClass(node, path, includePath, 'fai-view')
+                                                                                        if kind == 'Span'
+                                                                                            renderSpan(node, path, includePath)
+                                                                                        else
+                                                                                            renderDivWithClass(node, path, includePath, 'fai-view')
+                                                                                        end
                                                                                     end
                                                                                 end
                                                                             end
@@ -441,6 +445,31 @@ do
         attrs = attrs + ' onkeydown="if(event.key===\'Enter\'){handleSubmitEvent(' + submitId + ')}"'
     end
     '<input type="' + inputType + '"' + attrs + '/>'
+end
+
+# Render a TextArea.
+def renderTextArea
+    @param node ViewNode
+    @param path String
+    @param includePath Bool
+    @return String
+do
+    let placeholder = propOr(node.props, 'placeholder', '')
+    let value = propOr(node.props, 'value', '')
+    let modStyle = propsToStyle(node.props)
+    var attrs = nodeAttrs(node, path, includePath) + ' class="fai-textarea"'
+    if modStyle != ''
+        attrs = attrs + ' style="' + modStyle + '"'
+    end
+    attrs = attrs + ' placeholder="' + placeholder + '"'
+    if hasKey(node.props, 'rows')
+        attrs = attrs + ' rows="' + toString(getInt(node.props, 'rows')) + '"'
+    end
+    if hasKey(node.props, 'changeHandlerId')
+        let changeId = toString(getInt(node.props, 'changeHandlerId'))
+        attrs = attrs + ' oninput="handleInputEvent(' + changeId + ',this.value)"'
+    end
+    '<textarea' + attrs + '>' + value + '</textarea>'
 end
 
 # Render an Image.
@@ -913,6 +942,12 @@ test renderToHtml
         let html = renderToHtml(node)
         assert.equals(string.contains(html, 'onkeydown'), false)
     end
+    it 'renders a textarea with value'
+        let props = set(set({}, 'placeholder', 'Body'), 'value', 'hello')
+        let node = leaf('TextArea', props)
+        let html = renderToHtml(node)
+        assert.equals(html, '<textarea class="fai-textarea" placeholder="Body">hello</textarea>')
+    end
 end
 
 test renderToHtml
@@ -1332,6 +1367,23 @@ test renderTextInput
     it 'defaults the input type to text'
         let n = leaf('TextInput', {})
         assert.equals(string.startsWith(renderTextInput(n, '', false), '<input type="text"'), true)
+    end
+end
+
+test renderTextArea
+    it 'emits a <textarea> with placeholder and value'
+        let p = set(set({}, 'placeholder', 'Body'), 'value', 'foo')
+        let n = leaf('TextArea', p)
+        let html = renderTextArea(n, '', false)
+        assert.equals(string.contains(html, 'placeholder="Body"'), true)
+        assert.equals(string.contains(html, '>foo</textarea>'), true)
+    end
+    it 'emits rows and change handler when present'
+        let p = set(set(set({}, 'placeholder', 'Body'), 'rows', 8), 'changeHandlerId', 4)
+        let n = leaf('TextArea', p)
+        let html = renderTextArea(n, '', false)
+        assert.equals(string.contains(html, 'rows="8"'), true)
+        assert.equals(string.contains(html, 'oninput="handleInputEvent(4,this.value)"'), true)
     end
 end
 
