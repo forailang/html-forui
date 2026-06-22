@@ -44,6 +44,11 @@ end
 `renderToString` delegates to `Forui.renderSSR`. Loader-backed signals render in
 their loading state during SSR and then load on the browser client.
 
+Polling through `Forui.signal.usePoll` is owned by Forui and the language async
+timer runtime. `HtmlForui` does not expose a timer API; poll handlers mutate
+signals or call `reload()`, and `htmlRender` receives the resulting diff patches
+through the normal render cycle.
+
 ## Shell Assets
 
 The HTML shell should include:

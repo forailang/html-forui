@@ -22,6 +22,10 @@ server-rendered HTML, this is the package you depend on alongside
 - DOM-patch primitives (`patchPathForOps`, `findNodeAtPath`, …) used
   by the live-update path; rarely called directly from app code.
 
+Forui polling (`Forui.signal.usePoll`) does not add an adapter timer API here.
+The hook uses Forui signal lifecycle plus the generated async timer runtime; this
+adapter only applies the diff patches produced by normal re-renders.
+
 ## Install
 
 ```toml
